@@ -1,0 +1,20 @@
+{
+  "name": "mp",
+  "version": "0.0.1",
+  "description": "Simple multiplayer deathmatch game written in javascripts",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "browserify": "^8.0.2",
+    "connect": "^3.3.3",
+    "ecstatic": "^0.5.8"
+  }
+}
