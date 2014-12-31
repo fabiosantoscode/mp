@@ -6,6 +6,18 @@ QUnit.module('Networld')
 
 var Networld = mp.Networld
 
+window.FakeEntity = function FakeEntity(id, netver) {
+    if (id != null) this.id = id
+    if (netver != null) this._net_version = netver
+}
+FakeEntity.prototype = Object.create(mp.Entity.prototype);
+FakeEntity.prototype.constructor = FakeEntity;
+FakeEntity.prototype.serialize = function () {
+    var r = { id: this.id }
+    if ('datas' in this) r.datas = this.datas
+    return r;
+}
+
 test('receive them packets', function () {
     var networld = new Networld();
 
@@ -13,12 +25,12 @@ test('receive them packets', function () {
     networld._onPacket({
         id: 1,
         updates: [
-            ['add', 'Player', { id: {}, center: { x: 10, y: 10 }, direction: { x: 10, y: 10 } }]
+            ['add', 'FakeEntity', { id: {}, center: { x: 10, y: 10 }, direction: { x: 10, y: 10 } }]
         ]
     });
 
     equal(mp.entities.length, 1)
-    ok(mp.entities[0] instanceof mp.Player)
+    ok(mp.entities[0] instanceof FakeEntity)
 })
 
 function testWithWorld(name, cb) {
@@ -29,7 +41,7 @@ function testWithWorld(name, cb) {
         networld._onPacket({
             id: 1,
             updates: [
-                ['add', 'Player', { id: 1, center: { x: 10, y: 10 }, direction: { x: 10, y: 10 } }]
+                ['add', 'FakeEntity', { id: 1, center: { x: 10, y: 10 }, direction: { x: 10, y: 10 } }]
             ]
         });
 
@@ -38,17 +50,54 @@ function testWithWorld(name, cb) {
 }
 
 testWithWorld('discard them old packets', function (networld) {
-    var somePlayer = ['add', 'Player', { id: 2, center: { x: 1, y: 1 } }]
+    var somePlayer = ['add', 'FakeEntity', { id: 2, center: { x: 1, y: 1 } }]
     networld._onPacket({ id: 0, updates: [ somePlayer ] });
     equal(mp.entities.length, 1);
     ok(mp.entities[0].id != 2);
 
     networld._onPacket({ id: 2, updates: [ somePlayer ] });
     equal(mp.entities.length, 2);
-    ok(mp.entities[1] instanceof mp.Player);
-    ok(mp.entities[1].id == 2);
+    ok(mp.entities[1] instanceof FakeEntity);
+    equal(mp.entities[1].id, 2);
 })
 
+testWithWorld('Commit the worlds version and create them badass diffs', function (networld) {
+    mp.entities = []
+    networld.commit()
+    equal(networld.version, 1)
+
+    deepEqual(networld._diff(0), [])
+
+    mp.entities.push(new FakeEntity(1))
+    mp.entities.push(new FakeEntity(2))
+    networld.commit()
+    equal(networld.version, 2)
+    deepEqual(mp.entities.map((ent) => ent._net_version), [1, 1], 'versions of entities match world version where they were created')
+
+    deepEqual(networld._diff(-1), [
+        ['add', 'FakeEntity', { id: 1 }],
+        ['add', 'FakeEntity', { id: 2 }]
+    ])
+
+    mp.entities[1].datas = 'ichanged'
+    networld.commit()
+    equal(mp.entities[1]._net_version, 2, 'since I changed its datas, entities[1] should have its _net_version attr updated')
+    equal(mp.entities[0]._net_version, 1, '...but entities[0] stays on the same _net_version')
+    equal(networld.version, 3)
+
+    deepEqual(networld._diff(-1), [
+        ['add', 'FakeEntity', { id: 1 }],
+        ['add', 'FakeEntity', { id: 2, datas: 'ichanged' }]
+    ])
+
+    deepEqual(networld._diff(1), [
+        ['add', 'FakeEntity', { id: 2, datas: 'ichanged' }]
+    ])
+    
+    networld.commit()
+    equal(networld.version, 3)
+    deepEqual(networld._diff(3), [], 'diff is nothing because nothing happened');
+})
 
 QUnit.module('Player');
 
