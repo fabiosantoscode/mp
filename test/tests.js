@@ -1,7 +1,8 @@
+var mp = require('../lib/mp.js')
+var util = require('util')
+
 
 QUnit.module('Networld')
-
-var mp = require('../lib/mp.js')
 
 var Networld = mp.Networld
 
@@ -46,4 +47,83 @@ testWithWorld('discard them old packets', function (networld) {
     equal(mp.entities.length, 2);
     ok(mp.entities[1] instanceof mp.Player);
     ok(mp.entities[1].id == 2);
+})
+
+
+QUnit.module('Player');
+
+test('can shoot, spawns subclasses of Bullet', function () {
+    mp.entities = []
+    var player = new mp.Player()
+    mp.entities.push(player)
+    player.shoot()
+    equal(mp.entities.length, 2)
+    console.log(mp.entities)
+    ok(mp.entities[1] instanceof mp.Bullet);
+})
+
+function FakeBullet() { this.center = {x: 0, y: 0}; this.direction = { x: 0, y: 0}}
+util.inherits(FakeBullet, mp.Bullet)
+
+function FakeBullet2() { FakeBullet.apply(this, arguments); }
+util.inherits(FakeBullet2, FakeBullet)
+
+function playerWithSomeAmmo() {
+    var player = new mp.Player()
+
+    player.addBullets({
+        count: 3,
+        bullet: FakeBullet
+    })
+    
+    return player;
+}
+
+test('can gain ammo', function () {
+    var player = playerWithSomeAmmo()
+
+    ok(typeof player.weapons === 'object', 'player has a weapons array')
+
+    mp.entities = [player]    
+    deepEqual(player.weapons, [{
+        count: 3,
+        bullet: FakeBullet
+    }], 'player.weapons gets our new weapon');
+})
+
+test('can lose ammo', function () {
+    var player = playerWithSomeAmmo()
+    mp.entities = [player]
+
+    player.shoot()
+
+    deepEqual(player.weapons, [{
+        count: 2,
+        bullet: FakeBullet
+    }], 'player.weapons[].count gets reduced at each shot');
+})
+
+test('loses a weapon when its ammo is no moar', function () {
+    var player = playerWithSomeAmmo()
+    mp.entities = [player]
+
+    player.addBullets({
+        count: 1,
+        bullet: FakeBullet2
+    })
+    
+    deepEqual(player.weapons, [{
+        count: 1,
+        bullet: FakeBullet2
+    }, {
+        count: 3,
+        bullet: FakeBullet
+    }], 'player.weapons[].count gets reduced at each shot');
+    
+    player.shoot();
+    
+    deepEqual(player.weapons, [{
+        count: 3,
+        bullet: FakeBullet
+    }], 'player.weapons[] lost a weapon');
 })
