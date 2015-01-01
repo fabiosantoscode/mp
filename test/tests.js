@@ -1,4 +1,5 @@
 var mp = require('../lib/mp.js')
+var sinon = require('sinon')
 var util = require('util')
 
 
@@ -9,6 +10,7 @@ var Networld = mp.Networld
 window.FakeEntity = function FakeEntity(id, netver) {
     if (id != null) this.id = id
     if (netver != null) this._net_version = netver
+    mp.Entity.call(this);
 }
 FakeEntity.prototype = Object.create(mp.Entity.prototype);
 FakeEntity.prototype.constructor = FakeEntity;
@@ -97,6 +99,38 @@ testWithWorld('Commit the worlds version and create them badass diffs', function
     networld.commit()
     equal(networld.version, 3)
     deepEqual(networld._diff(3), [], 'diff is nothing because nothing happened');
+})
+
+var ent
+
+QUnit.module('Entity', {
+    setup: function () {
+        ent = new mp.Entity()
+        ent.center = { x: 10, y: 10 }
+        ent.direction = { x: 0, y: 0 }
+    }
+});
+
+test('Can extrapolate its coords into the next tick', function () {
+    ent.direction.x = 10
+    ent.direction.y = 10
+    deepEqual(
+        ent.extrapolated(1),
+        { x: 20, y: 20 },
+        'extrapolate a full frame')
+    deepEqual(
+        ent.extrapolated(0.5),
+        { x: 15, y: 15 },
+        'extrapolate half a frame')
+})
+
+test('Its update() method uses extrapolated(1) to get its new coords', function () {
+    var newCoords = { x: 999, y: 999 }
+    ent.extrapolated = sinon.stub().returns(newCoords)
+    ent.update()
+    ok(ent.extrapolated.calledOnce, 'ent.extrapolated called with (1)')
+    ok(ent.extrapolated.calledWith(1), 'ent.extrapolated called with (1)')
+    strictEqual(ent.center, newCoords, 'ent.center was set to the return value of extrapolated')
 })
 
 QUnit.module('Player');

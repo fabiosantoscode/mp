@@ -16,5 +16,8 @@
     "browserify": "^8.0.2",
     "connect": "^3.3.3",
     "ecstatic": "^0.5.8"
+  },
+  "devDependencies": {
+    "sinon": "~1.8.2"
   }
 }
