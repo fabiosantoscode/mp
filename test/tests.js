@@ -1,4 +1,4 @@
-var mp = require('../lib/mp.js')
+var mp = require('../lib/mp.js')()
 var sinon = require('sinon')
 var util = require('util')
 
