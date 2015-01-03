@@ -25,6 +25,7 @@ function serveBrowserify(entryPoint) {
 }
 
 app.use('/clientbundle.js', serveBrowserify('./lib/client.js'))
+app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
 
 app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
 
