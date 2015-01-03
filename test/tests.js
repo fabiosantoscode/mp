@@ -125,7 +125,7 @@ test('Can extrapolate its coords into the next tick', function () {
 })
 
 test('Its update() method uses extrapolated(1) to get its new coords', function () {
-    var newCoords = { x: 999, y: 999 }
+    var newCoords = { x: 99, y: 99 }
     ent.extrapolated = sinon.stub().returns(newCoords)
     ent.update()
     ok(ent.extrapolated.calledOnce, 'ent.extrapolated called with (1)')
@@ -145,7 +145,11 @@ test('can shoot, spawns subclasses of Bullet', function () {
     ok(mp.entities[1] instanceof mp.Bullet);
 })
 
-function FakeBullet() { this.center = {x: 0, y: 0}; this.direction = { x: 0, y: 0}}
+function FakeBullet() {
+    this.center = {x: 0, y: 0};
+    this.direction = { x: 0, y: 0}
+    this.speed = 1
+}
 util.inherits(FakeBullet, mp.Bullet)
 
 function FakeBullet2() { FakeBullet.apply(this, arguments); }
