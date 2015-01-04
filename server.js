@@ -71,17 +71,14 @@ function getOrCreateRoom(path) {
 function createRoom() {
     var mp = makeMp()
     var networld = new mp.Networld({ isServer: true })
-    var main = makeMain({ networld: networld, isServer: true, mp: mp, player: null, camera: null })
+    var main = makeMain({
+        networld: networld,
+        isServer: true,
+        mp: mp,
+        camera: null,
+    })
     var players = 0
 
-    function onFrame() {
-        var howFarIntoNextFrame = main.tick()
-        var howMuchForNextFrame = 1 - howFarIntoNextFrame
-        var howMuchToWaitForNextFrame = howMuchForNextFrame * (1000 / TPS)
-        setTimeout(onFrame, howMuchToWaitForNextFrame)
-    }
-
-    onFrame()
     return Object.freeze({
         addPlayer: function (socket) {
             main.createReadStream()
