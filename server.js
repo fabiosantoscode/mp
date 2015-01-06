@@ -7,7 +7,7 @@ var fs = require('fs');
 
 var ws = require('ws');
 var es = require('event-stream');
-var websocketStream = require('websocket-stream');
+var websocketStream = require('./vendor/websocket-stream');
 var browserify = require('browserify');
 var ecstatic = require('ecstatic');
 var connect = require('connect');
@@ -82,18 +82,22 @@ function createRoom() {
     return Object.freeze({
         addPlayer: function (socket) {
             main.createReadStream()
-                .pipe(es.stringify())
+                .pipe(es.mapSync(function (data) {
+                    return new Buffer(JSON.stringify(data), 'utf-8') }))
                 .pipe(socket)
             var player = new mp.Player()
             socket
                 .pipe(es.mapSync(function (data) {
-                    return data.toString('utf-8') }))
-                .pipe(es.parse())
+                    return JSON.parse(data.toString('utf-8')) }))
                 .pipe(player.createWriteStream())
+            socket.on('end', this.removePlayer.bind(this, socket))
+            socket.on('error', this.removePlayer.bind(this, socket))
             mp.entities.push(player)
             players++;
         },
-        removePlayer: function () {
+        removePlayer: function (sock, err) {
+            if (sock) { sock.destroy() }
+            if (err) { console.error(err) }
             players--;
             if (players === 0) {
                 main = null
