@@ -90,17 +90,18 @@ function createRoom() {
                 .pipe(es.mapSync(function (data) {
                     return JSON.parse(data.toString('utf-8')) }))
                 .pipe(player.createWriteStream())
-            socket.on('end', this.removePlayer.bind(this, socket))
+            socket.on('close', this.removePlayer.bind(this, socket))
             socket.on('error', this.removePlayer.bind(this, socket))
             mp.entities.push(player)
             players++;
         },
         removePlayer: function (sock, err) {
-            if (sock) { sock.destroy() }
             if (err) { console.error(err) }
             players--;
+            // TODO remove player
             if (players === 0) {
-                main = null
+                // TODO destroy game
+                // main = null
             }
         }
     })
