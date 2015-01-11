@@ -42,14 +42,12 @@ app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js')
 app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
 app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
 
-app.use(ecstatic({
+app.use('/test', ecstatic({
     root: path.join(__dirname, 'test'),
-    baseDir: '/test'
 }));
 
 app.use(ecstatic({
     root: path.join(__dirname, 'public'),
-    baseDir: '/'
 }));
 
 var port = +(process.argv[2] || '8080')
