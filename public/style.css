@@ -1,0 +1,58 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.keyboard * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.game-canvas {
+    outline: 1px solid gray;
+    display: block;
+}
+
+.keyboard .left-buttons,
+.keyboard .right-buttons {
+    position: absolute;
+    bottom: 0;
+}
+
+.keyboard .touching {
+    background: gray;
+}
+
+.keyboard .left-buttons {
+    left: 0;
+}
+
+.keyboard .right-buttons {
+    right: 0;
+}
+
+.keyboard div > div {
+    display: inline-block;
+    padding: 1em;
+    margin: 0.2em;
+    background-color: #fef;
+}
+
+@media screen and (orientation: portrait) {
+    .game-canvas {
+        width: 100%;
+    }
+}
+
+@media screen and (orientation: landscape) {
+    .game-canvas {
+        height: 100vh;
+        margin: 0 auto;
+    }
+}
+
