@@ -16,6 +16,8 @@ html, body {
 .game-canvas {
     outline: 1px solid gray;
     display: block;
+    transform: translateZ(0);
+    image-rendering: -moz-crisp-edges;
 }
 
 .keyboard .left-buttons,
