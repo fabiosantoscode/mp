@@ -83,7 +83,7 @@ function createRoom() {
                 .pipe(es.mapSync(function (data) {
                     return new Buffer(JSON.stringify(data), 'utf-8') }))
                 .pipe(socket)
-            var player = new mp.Player()
+            var player = new mp.HumanPlayer()
             socket
                 .pipe(es.mapSync(function (data) {
                     return JSON.parse(data.toString('utf-8')) }))
