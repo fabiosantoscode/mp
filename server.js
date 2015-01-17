@@ -18,6 +18,7 @@ traceurRequire.makeDefault(function (filename) {
     return !/node_modules/.test(filename)
 })
 
+var makeDeathmatch = require('./lib/deathmatch.js')
 var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
 
@@ -67,7 +68,9 @@ function getOrCreateRoom(path) {
 }
 
 function createRoom() {
-    var mp = makeMp()
+    var mp = makeDeathmatch({
+        mp: makeMp()
+    })
     var networld = new mp.Networld({ isServer: true })
     var main = makeMain({
         networld: networld,
