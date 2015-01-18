@@ -84,11 +84,13 @@ function createRoom() {
 
     return Object.freeze({
         addPlayer: function (socket) {
+            var player = new mp.HumanPlayer()
+            socket.write(JSON.stringify([
+                'you', player.serialize()]))
             main.createReadStream()
                 .pipe(es.mapSync(function (data) {
                     return new Buffer(JSON.stringify(data), 'utf-8') }))
                 .pipe(socket)
-            var player = new mp.HumanPlayer()
             socket
                 .pipe(es.mapSync(function (data) {
                     return JSON.parse(data.toString('utf-8')) }))
