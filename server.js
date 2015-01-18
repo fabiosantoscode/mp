@@ -18,6 +18,7 @@ traceurRequire.makeDefault(function (filename) {
     return !/node_modules/.test(filename)
 })
 
+var worldGen = require('./lib/worldgen.js')
 var makeDeathmatch = require('./lib/deathmatch.js')
 var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
@@ -78,6 +79,7 @@ function createRoom() {
         mp: mp,
         camera: null,
     })
+    worldGen({ mp: mp, range: [-1000, 1000] })
     var players = 0
 
     return Object.freeze({
