@@ -19,6 +19,7 @@ traceurRequire.makeDefault(function (filename) {
 })
 
 var worldGen = require('./lib/worldgen.js')
+var makeCompressor = require('./lib/netcompressor.js')
 var makeDeathmatch = require('./lib/deathmatch.js')
 var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
@@ -87,7 +88,9 @@ function createRoom() {
             var player = new mp.HumanPlayer()
             socket.write(JSON.stringify([
                 'you', player.serialize()]))
+
             main.createReadStream()
+                .pipe(makeCompressor(player, mp))
                 .pipe(es.mapSync(function (data) {
                     return new Buffer(JSON.stringify(data), 'utf-8') }))
                 .pipe(socket)
