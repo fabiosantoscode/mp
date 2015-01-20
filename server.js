@@ -33,7 +33,7 @@ function serveBrowserify(entryPoint) {
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
         var b = browserify({
             entries: [entryPoint],
-            debug: DEBUG
+            debug: false
         })
         b.bundle().pipe(res)
     }
