@@ -25,18 +25,27 @@ var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
 
 var TPS = 24  // ticks per second
-var DEBUG = true
+var DEBUG = false
 
 var app = connect();
 
 function serveBrowserify(entryPoint) {
+    var cached = null
     return function (req, res) {
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
+        if (cached) { return res.end(cached); }
+
         var b = browserify({
             entries: [entryPoint],
             debug: false
         })
-        b.bundle().pipe(res)
+        b.bundle().pipe(es.wait(function (err, body) {
+            if (err) {
+                return res.end('/* Error in serveBrowserify: ' + err + ' */');
+            }
+            if (!DEBUG) { cached = body; }
+            res.end(body);
+        }))
     }
 }
 
