@@ -11,6 +11,7 @@ var websocketStream = require('./vendor/websocket-stream');
 var browserify = require('browserify');
 var ecstatic = require('ecstatic');
 var connect = require('connect');
+var traceur = require('traceur/src/node/api.js');
 var traceurRequire = require('traceur/src/node/require.js');
 
 traceurRequire.makeDefault(function (filename) {
@@ -31,9 +32,14 @@ var app = connect();
 
 function serveBrowserify(entryPoint) {
     var cached = null
+    var traceurCached = null
     return function (req, res) {
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
-        if (cached) { return res.end(cached); }
+        if (cached) {
+            return res.end(/[?&;]noharmony(&|;|$)/.test(req.url) ?
+                traceurCached :
+                cached);
+        }
 
         var b = browserify({
             entries: [entryPoint],
@@ -43,7 +49,13 @@ function serveBrowserify(entryPoint) {
             if (err) {
                 return res.end('/* Error in serveBrowserify: ' + err + ' */');
             }
-            if (!DEBUG) { cached = body; }
+            if (!DEBUG) {
+                cached = body;
+                traceurCached = Buffer.concat([
+                    fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
+                    new Buffer(traceur.compile(body.toString('utf-8')), 'utf-8')
+                ])
+            }
             res.end(body);
         }))
     }

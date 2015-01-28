@@ -18,6 +18,7 @@ html, body {
     display: block;
     transform: translateZ(0);
     image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
 }
 
 .keyboard .left-buttons,
@@ -46,14 +47,16 @@ html, body {
 }
 
 @media screen and (orientation: portrait) {
-    .game-canvas {
+    .crisp-edges .game-canvas {
         width: 100%;
     }
 }
 
 @media screen and (orientation: landscape) {
-    .game-canvas {
+    .crisp-edges .game-canvas {
         height: 100vh;
+    }
+    .game-canvas {
         margin: 0 auto;
     }
 }
