@@ -16,6 +16,9 @@ html, body {
 .game-canvas {
     outline: 1px solid gray;
     display: block;
+
+    margin: 0 auto;
+
     transform: translateZ(0);
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
@@ -46,6 +49,18 @@ html, body {
     background-color: #fef;
 }
 
+.debug-info .debug {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    height: 1em;
+    line-height: 1em;
+    text-align: center;
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.5);
+}
+
 @media screen and (orientation: portrait) {
     .crisp-edges .game-canvas {
         width: 100%;
@@ -55,9 +70,6 @@ html, body {
 @media screen and (orientation: landscape) {
     .crisp-edges .game-canvas {
         height: 100vh;
-    }
-    .game-canvas {
-        margin: 0 auto;
     }
 }
 
