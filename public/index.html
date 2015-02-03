@@ -7,12 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <link rel="stylesheet" href="style.css">
 <canvas id=mainCanvas class=game-canvas height=100 width=100></canvas>
-<script src=maybe-harmony.js></script>
-<script>
-var crispEdgesSupport = !!(function (cvs) { cvs.style.imageRendering = 'crisp-edges'; cvs.style.imageRendering = '-moz-crisp-edges'; return cvs.style.imageRendering; }(document.createElement('canvas')));
-document.documentElement.classList.add(
-    crispEdgesSupport ? 'crisp-edges' : 'no-crisp-edges');
-</script>
+<script src=feature-detect.js></script>
 <script>
 loadMaybeHarmony('clientbundle.js')
 </script>

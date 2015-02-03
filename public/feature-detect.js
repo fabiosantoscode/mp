@@ -16,3 +16,15 @@ loadMaybeHarmony.harmonySupport = (function () {
     }
     return true;
 }())
+
+var crispEdgesSupport = (function (cvStyle) {
+    cvStyle.imageRendering = 'crisp-edges';
+    cvStyle.imageRendering = '-moz-crisp-edges';
+    return !!cvStyle.imageRendering;
+}(document.createElement('canvas').style));
+
+document.documentElement.classList.add(
+    crispEdgesSupport ?
+        'crisp-edges' :
+        'no-crisp-edges');
+
