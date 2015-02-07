@@ -21,7 +21,7 @@ traceurRequire.makeDefault(function (filename) {
 
 var worldGen = require('./lib/worldgen.js')
 var makeCompressor = require('./lib/netcompressor.js')
-var makeDeathmatch = require('./lib/deathmatch.js')
+var makeCapturePoint = require('./lib/capture-point.js')
 var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
 
@@ -91,7 +91,7 @@ function getOrCreateRoom(path) {
 }
 
 function createRoom() {
-    var mp = makeDeathmatch({
+    var mp = makeCapturePoint({
         mp: makeMp()
     })
     var networld = new mp.Networld({ isServer: true })
@@ -101,7 +101,7 @@ function createRoom() {
         mp: mp,
         camera: null,
     })
-    worldGen({ mp: mp, range: [-10000, 10000] })
+    worldGen({ mp: mp, range: [-1000, 1000] })
     var players = 0
 
     return Object.freeze({
