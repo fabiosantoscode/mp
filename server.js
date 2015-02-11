@@ -19,6 +19,7 @@ traceurRequire.makeDefault(function (filename) {
     return !/node_modules/.test(filename)
 })
 
+var makeClockSync = require('./lib/clock-sync')
 var worldGen = require('./lib/worldgen.js')
 var makeCompressor = require('./lib/netcompressor.js')
 var makeCapturePoint = require('./lib/capture-point.js')
@@ -140,5 +141,8 @@ webSocketServer.on('connection', function (ws) {
     var roomName = url.parse(ws.upgradeReq.url).path
     var room = getOrCreateRoom(roomName)
     var socketStream = websocketStream(ws)
+
+    makeClockSync(socketStream, { server: true })
+
     room.addPlayer(socketStream)
 });
