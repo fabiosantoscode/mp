@@ -36,8 +36,10 @@ function serveBrowserify(entryPoint) {
     var traceurCached = null
     return function (req, res) {
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
+
+        var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
         if (cached) {
-            return res.end(/[?&;]noharmony(&|;|$)/.test(req.url) ?
+            return res.end(useTraceur ?
                 traceurCached :
                 cached);
         }
@@ -50,14 +52,12 @@ function serveBrowserify(entryPoint) {
             if (err) {
                 return res.end('/* Error in serveBrowserify: ' + err + ' */');
             }
-            if (!DEBUG) {
-                cached = body;
-                traceurCached = Buffer.concat([
-                    fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
-                    new Buffer(traceur.compile(body.toString('utf-8')), 'utf-8')
-                ])
-            }
-            res.end(body);
+            cached = body;
+            traceurCached = Buffer.concat([
+                fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
+                new Buffer(traceur.compile(body.toString('utf-8')), 'utf-8')
+            ])
+            res.end(useTraceur ? traceurCached : cached);
         }))
     }
 }
