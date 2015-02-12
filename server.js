@@ -101,6 +101,7 @@ function createRoom() {
         isServer: true,
         mp: mp,
         camera: null,
+        debugInfo: DEBUG === true,
     })
     worldGen({ mp: mp, range: [-1000, 1000] })
     var players = 0
