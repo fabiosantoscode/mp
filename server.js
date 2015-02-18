@@ -34,13 +34,22 @@ var app = connect();
 function serveBrowserify(entryPoint) {
     var cached = null
     var traceurCached = null
+    function getTraceur() {
+        if (!traceurCached) {
+            traceurCached = Buffer.concat([
+                fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
+                new Buffer(traceur.compile(cached.toString('utf-8')), 'utf-8')
+            ])
+        }
+        return traceurCached
+    }
     return function (req, res) {
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
 
         var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
         if (cached) {
             return res.end(useTraceur ?
-                traceurCached :
+                getTraceur() :
                 cached);
         }
 
@@ -48,17 +57,19 @@ function serveBrowserify(entryPoint) {
             entries: [entryPoint],
             debug: false
         })
-        b.bundle().pipe(es.wait(function (err, body) {
+        var bun = b.bundle()
+
+        bun.pipe(es.wait(function (err, body) {
             if (err) {
                 return res.end('/* Error in serveBrowserify: ' + err + ' */');
             }
             cached = body;
-            traceurCached = Buffer.concat([
-                fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
-                new Buffer(traceur.compile(body.toString('utf-8')), 'utf-8')
-            ])
-            res.end(useTraceur ? traceurCached : cached);
+            if (useTraceur) { res.end(getTraceur()) }
         }))
+
+        if (!useTraceur) {
+            bun.pipe(res)
+        }
     }
 }
 
