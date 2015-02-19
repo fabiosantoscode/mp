@@ -55,7 +55,8 @@ function serveBrowserify(entryPoint) {
 
         var b = browserify({
             entries: [entryPoint],
-            debug: false
+            debug: false,
+            insertGlobals: true,
         })
         var bun = b.bundle()
 
