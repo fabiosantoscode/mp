@@ -7,11 +7,10 @@ var fs = require('fs');
 
 var ws = require('ws');
 var es = require('event-stream');
+var serveBrowserify = require('./serve-browserify.js')
 var websocketStream = require('./vendor/websocket-stream');
-var browserify = require('browserify');
 var ecstatic = require('ecstatic');
 var connect = require('connect');
-var traceur = require('traceur/src/node/api.js');
 var traceurRequire = require('traceur/src/node/require.js');
 
 traceurRequire.makeDefault(function (filename) {
@@ -31,50 +30,8 @@ var DEBUG = false
 
 var app = connect();
 
-function serveBrowserify(entryPoint) {
-    var cached = null
-    var traceurCached = null
-    function getTraceur() {
-        if (!traceurCached) {
-            traceurCached = Buffer.concat([
-                fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
-                new Buffer(traceur.compile(cached.toString('utf-8')), 'utf-8')
-            ])
-        }
-        return traceurCached
-    }
-    return function (req, res) {
-        res.setHeader('content-type', 'text/javascript; charset=utf-8')
 
-        var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
-        if (cached) {
-            return res.end(useTraceur ?
-                getTraceur() :
-                cached);
-        }
-
-        var b = browserify({
-            entries: [entryPoint],
-            debug: false,
-            insertGlobals: true,
-        })
-        var bun = b.bundle()
-
-        bun.pipe(es.wait(function (err, body) {
-            if (err) {
-                return res.end('/* Error in serveBrowserify: ' + err + ' */');
-            }
-            cached = body;
-            if (useTraceur) { res.end(getTraceur()) }
-        }))
-
-        if (!useTraceur) {
-            bun.pipe(res)
-        }
-    }
-}
-
-app.use('/clientbundle.js', serveBrowserify('./lib/client.js'))
+app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache */))
 app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
 app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
 app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
