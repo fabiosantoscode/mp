@@ -97,8 +97,6 @@ function createRoom() {
                 .pipe(es.mapSync(function (data) {
                     return JSON.parse(data.toString('utf-8')) }))
                 .pipe(player.createWriteStream())
-            socket.on('close', this.removePlayer.bind(this, socket))
-            socket.on('error', this.removePlayer.bind(this, socket))
             mp.entities.push(player)
             players++;
         },
