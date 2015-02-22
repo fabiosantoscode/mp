@@ -4,8 +4,7 @@ var es = require('event-stream');
 var browserify = require('browserify');
 var fs = require('fs')
 var path = require('path')
-var traceur = require('traceur/src/node/api.js')
-var Promise = require("bluebird");
+var traceur = require('traceur/src/node/api.js');
 
 module.exports = function serveBrowserify(entryPoint, precache) {
     var cached = null
@@ -19,24 +18,20 @@ module.exports = function serveBrowserify(entryPoint, precache) {
         }
         return traceurCached
     }
-    function getBrowserified(andPipeTo) {
-        return new Promise(function (resolve) {
-            var b = browserify({
-                entries: [entryPoint],
-                debug: false,
-                insertGlobals: true,
-            })
-            var bun = b.bundle()
-
-            bun.pipe(es.wait(function (err, body) {
-                if (err) {
-                    return res.end('/* Error in serveBrowserify: ' + err + ' */');
-                }
-                resolve(body)
-            }))
-
-            if (andPipeTo) bun.pipe(andPipeTo)
+    function getBrowserified(cb) {
+        var b = browserify({
+            entries: [entryPoint],
+            debug: false,
+            insertGlobals: true,
         })
+        var bun = b.bundle()
+
+        bun.pipe(es.wait(function (err, body) {
+            if (err) {
+                return res.end('/* Error in serveBrowserify: ' + err + ' */');
+            }
+            cb && cb(body)
+        }))
     }
 
     if (precache) cached = getBrowserified(null)  // Warm up the cache
@@ -46,14 +41,14 @@ module.exports = function serveBrowserify(entryPoint, precache) {
         var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
 
         if (!cached) {
-            cached = getBrowserified(useTraceur ? null : res)
-            if (!useTraceur) { return; /* We're already piping the response */ }
+            return getBrowserified(function (body) {
+                cached = body
+                res.end(useTraceur ? getTraceur() : cached)
+            })
         }
 
-        cached.then(function (cached) {
-            res.end(useTraceur ?
-                getTraceur() :
-                cached)
-        })
+        res.end(useTraceur ?
+            getTraceur() :
+            cached)
     }
 }

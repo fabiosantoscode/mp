@@ -18,7 +18,6 @@
   "license": "MIT",
   "dependencies": {
     "async": "^0.9.0",
-    "bluebird": "^2.9.12",
     "browserify": "^8.0.2",
     "cappedarray": "^0.1.2",
     "compression": "^1.4.1",
