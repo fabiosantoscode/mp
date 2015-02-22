@@ -90,6 +90,11 @@ function createRoom() {
 
             main.createReadStream()
                 .pipe(makeCompressor(player, mp))
+                .pipe(es.mapSync(function (data)  {
+                    return data[0] === 'set3d' ?
+                        [+new Date()].concat(data) :
+                        data
+                }))
                 .pipe(es.mapSync(function (data) {
                     return new Buffer(JSON.stringify(data), 'utf-8') + '\n' }))
                 .pipe(socket)
