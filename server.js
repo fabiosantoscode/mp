@@ -31,7 +31,7 @@ var DEBUG = false
 var app = connect();
 
 
-app.use(require('compression'))
+app.use(require('compression')())
 app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache */))
 app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
 app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
