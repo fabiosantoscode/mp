@@ -33,6 +33,7 @@ var app = connect();
 
 app.use(require('compression')())
 app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache */))
+app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js'))
 app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
 app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
 app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
@@ -40,6 +41,11 @@ app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
 app.use('/test', ecstatic({
     root: path.join(__dirname, 'test'),
 }));
+
+app.use('/spectate', function (req, res) {
+    res.setHeader('content-type', 'text/html;charset=utf-8')
+    res.end(fs.readFileSync(path.join(__dirname, 'public', 'spectate.html')))
+})
 
 app.use(ecstatic({
     root: path.join(__dirname, 'public'),
@@ -96,24 +102,31 @@ function createRoom() {
             mp.entities.push(player)
             players++;
         },
-        removePlayer: function (sock, err) {
-            if (err) { console.error(err) }
-            players--;
-            // TODO remove player
-            if (players === 0) {
-                // TODO destroy game
-                // main = null
-            }
+        addSpectator: function (socket) {
+            main.createReadStream()
+                .pipe(es.stringify())
+                .pipe(es.mapSync(function(data) { return data + '\n' }))
+                .pipe(socket)
         }
     })
 }
 
 webSocketServer.on('connection', function (ws) {
-    var roomName = url.parse(ws.upgradeReq.url).path
-    var room = getOrCreateRoom(roomName)
     var socketStream = websocketStream(ws)
 
-    makeClockSync(socketStream, { server: true })
+    var roomName = url.parse(ws.upgradeReq.url).path
+    var isSpectate = /^\/spectate/.test(roomName)
+    roomName = roomName.replace(/^\/spectate/, '')
+    roomName = roomName.replace(/^\/|\/$/g, '')
+    roomName = '/' + roomName
 
-    room.addPlayer(socketStream)
+    var room = getOrCreateRoom(roomName)
+
+    if (isSpectate) {
+        room.addSpectator(socketStream)
+    } else {
+        room.addPlayer(socketStream)
+    }
+
+    makeClockSync(socketStream, { server: true })
 });
