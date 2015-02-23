@@ -26,7 +26,7 @@ var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
 
 var TPS = 24  // ticks per second
-var DEBUG = true
+var DEBUG = process.argv.indexOf('--debug') !== -1
 
 var app = connect();
 
