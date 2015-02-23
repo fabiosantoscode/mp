@@ -132,4 +132,7 @@ webSocketServer.on('connection', function (ws) {
     }
 
     makeClockSync(socketStream, { server: true })
+
+    socketStream.on('error', function () { socketStream.end() })
 });
+
