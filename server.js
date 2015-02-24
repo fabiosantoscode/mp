@@ -79,7 +79,7 @@ function createRoom() {
         camera: null,
         debugInfo: DEBUG === true,
     })
-    worldGen({ mp: mp, range: [-1000, 1000] })
+    worldGen({ mp: mp, range: [-10000, 10000] })
     var players = 0
 
     return Object.freeze({
