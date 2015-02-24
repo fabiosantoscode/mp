@@ -4,6 +4,16 @@ html, body {
     padding: 0;
 }
 
+.weapon-info {
+    position: absolute
+}
+
+.weapon-info .weapon-ammo {
+    display: inline-block;
+    transform: rotate(0);
+    transition: transform ease 1s;
+}
+
 .keyboard * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
