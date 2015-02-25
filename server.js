@@ -47,7 +47,7 @@ app.use('/spectate', function (req, res) {
     res.end(fs.readFileSync(path.join(__dirname, 'public', 'spectate.html')))
 })
 
-app.use(ecstatic({
+app.use('/', ecstatic({
     root: path.join(__dirname, 'public'),
 }));
 

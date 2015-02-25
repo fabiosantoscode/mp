@@ -6,6 +6,8 @@ var fs = require('fs')
 var path = require('path')
 var traceur = require('traceur/src/node/api.js');
 
+var thisRunID = +new Date()
+
 module.exports = function serveBrowserify(entryPoint, precache) {
     var cached = null
     var traceurCached = null
@@ -36,7 +38,13 @@ module.exports = function serveBrowserify(entryPoint, precache) {
 
     if (precache) cached = getBrowserified(null)  // Warm up the cache
     return function serveBrowserify(req, res) {
+        if (+req.headers['if-none-match'] === thisRunID) {
+            res.statusCode = 304
+            res.end()
+            return
+        }
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
+        res.setHeader('etag', thisRunID)
 
         var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
 
