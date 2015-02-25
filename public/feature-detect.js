@@ -19,6 +19,7 @@ loadMaybeHarmony.harmonySupport = (function () {
 
 var crispEdgesSupport = (function (cvStyle) {
     cvStyle.imageRendering = 'crisp-edges';
+    cvStyle.imageRendering = 'pixelated';
     cvStyle.imageRendering = '-moz-crisp-edges';
     return !!cvStyle.imageRendering;
 }(document.createElement('canvas').style));
