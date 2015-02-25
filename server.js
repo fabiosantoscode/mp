@@ -38,6 +38,18 @@ app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js')
 app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
 app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
 
+app.use('/', function (req, res, next) {
+    if (url.parse(req.url).path !== '/') return next()
+    res.statusCode = 301
+    res.setHeader('location', '/room/main')
+    res.end()
+})
+
+app.use('/room/', function (req, res) {
+    res.setHeader('content-type', 'text/html;charset=utf-8')
+    res.end(fs.readFileSync(path.join(__dirname, 'public', 'index.html')))
+})
+
 app.use('/test', ecstatic({
     root: path.join(__dirname, 'test'),
 }));
@@ -62,10 +74,7 @@ var webSocketServer = new ws.Server({ server: server })
 
 var rooms = {};
 
-function getOrCreateRoom(path) {
-    rooms['room:' + path] = rooms['room:' + path] || createRoom()
-    return rooms['room:' + path]
-}
+rooms['/room/main'] = createRoom()
 
 function createRoom() {
     var mp = makeCapturePoint({
@@ -123,7 +132,7 @@ webSocketServer.on('connection', function (ws) {
     roomName = roomName.replace(/^\/|\/$/g, '')
     roomName = '/' + roomName
 
-    var room = getOrCreateRoom(roomName)
+    var room = rooms[roomName]
 
     if (isSpectate) {
         room.addSpectator(socketStream)
