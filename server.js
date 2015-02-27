@@ -94,6 +94,7 @@ function createRoom() {
     return Object.freeze({
         addPlayer: function (socket) {
             var player = new mp.HumanPlayer()
+            player.center = mp.getSpawnPoint(player)
             socket.write(JSON.stringify([
                 'you', player.serialize()]) + '\n')
 
