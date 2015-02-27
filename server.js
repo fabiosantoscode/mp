@@ -114,6 +114,11 @@ function createRoom() {
                 .pipe(player.createWriteStream())
             mp.entities.push(player)
             players++;
+
+            socket.on('close', function disconnectPlayer() {
+                players--
+                mp.entities.remove(player)
+            })
         },
         addSpectator: function (socket) {
             main.createReadStream()
