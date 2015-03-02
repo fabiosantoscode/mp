@@ -30,7 +30,7 @@ module.exports = function serveBrowserify(entryPoint, precache) {
 
         bun.pipe(es.wait(function (err, body) {
             if (err) {
-                return res.end('/* Error in serveBrowserify: ' + err + ' */');
+                return console.error('/* Error in serveBrowserify! */', err);
             }
             cb && cb(body)
         }))

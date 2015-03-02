@@ -9,6 +9,7 @@ function loadMaybeHarmony(src) {
 }
 
 loadMaybeHarmony.harmonySupport = (function () {
+    /* jshint evil: true */
     try {
         eval('() => 1');
     } catch(e) {
