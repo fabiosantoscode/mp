@@ -93,10 +93,11 @@ function createRoom() {
 
     return Object.freeze({
         addPlayer: function (socket) {
-            var player = new mp.HumanPlayer()
+            var PlayerClass = mp.getPlayerClass()
+            var player = new PlayerClass()
             player.center = mp.getSpawnPoint(player)
             socket.write(JSON.stringify([
-                'you', player.serialize()]) + '\n')
+                'you', PlayerClass.name, player.serialize()]) + '\n')
 
             main.createReadStream()
                 .pipe(makeCompressor(player, mp))
