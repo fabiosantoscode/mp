@@ -116,6 +116,8 @@ function createRoom() {
             mp.entities.push(player)
             players++;
 
+            require('./lib/push-player-position.js')(player)
+
             socket.on('close', function disconnectPlayer() {
                 players--
                 mp.entities.remove(player)
