@@ -1,3 +1,5 @@
+'use strict'
+
 function QuadTree(x, y, w, h, options) {
 
     if( typeof x != 'number' || isNaN(x) )
