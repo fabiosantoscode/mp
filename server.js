@@ -109,6 +109,7 @@ function createRoom() {
                 .pipe(es.mapSync(function (data) {
                     return new Buffer(JSON.stringify(data) + '\n' , 'utf-8')}))
                 .pipe(socket)
+
             socket
                 .pipe(es.mapSync(function (data) {
                     return JSON.parse(data.toString('utf-8')) }))
