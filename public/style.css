@@ -85,6 +85,10 @@ html, body {
     }
 }
 
+body.rooms {
+    text-align: center;
+}
+
 .homepage-spectate {
     position: relative;
     height: 200px;
