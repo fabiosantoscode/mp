@@ -2,6 +2,7 @@
 html, body {
     margin: 0;
     padding: 0;
+    font-family: sans-serif;
 }
 
 .weapon-info {
@@ -83,4 +84,42 @@ html, body {
         height: 100vh;
     }
 }
+
+.homepage-spectate {
+    position: relative;
+    height: 200px;
+    width: 200px;
+    display: inline-block;
+    margin: 1em;
+}
+
+.homepage-spectate .playbtn {
+    opacity: 0.2;
+    transition: opacity 150ms linear;
+    transition-property: color, opacity;
+    color: black;
+    text-shadow: 1px 1px 0 pink;
+    position: absolute;
+    top:0;left:0;right:0;bottom:0;
+    background: green;
+    color: white;
+    text-align: center;
+    height: 200px;
+    box-sizing: border-box;
+    padding-top: 25px;
+    line-height: 25px;
+    white-space: pre;
+}
+.homepage-spectate:hover .playbtn {
+    opacity: 0.8;
+}
+
+.homepage-spectate iframe{
+    width: 200px;
+    height: 200px;
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
 

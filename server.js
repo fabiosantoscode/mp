@@ -28,10 +28,14 @@ var makeMain = require('./lib/main.js')
 var TPS = 24  // ticks per second
 var DEBUG = process.argv.indexOf('--debug') !== -1
 
+var rooms = {}
+
 var app = connect();
 
 
+
 app.use(require('compression')())
+app.use('/roomsbundle.js', serveBrowserify('./lib/rooms.js', true /* precache */))
 app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache */))
 app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js'))
 app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
@@ -39,16 +43,17 @@ app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
 app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
 
 app.use('/', function (req, res, next) {
-    if (url.parse(req.url).path !== '/') return next()
-    res.statusCode = 301
-    res.setHeader('location', '/room/main')
-    res.end()
+    if (url.parse(req.url).pathname !== '/') return next()
+    res.setHeader('content-type', 'text/html;charset=utf-8')
+    res.end(fs.readFileSync(path.join(__dirname, 'public', 'rooms.html')))
 })
 
 app.use('/room/', function (req, res) {
     res.setHeader('content-type', 'text/html;charset=utf-8')
     res.end(fs.readFileSync(path.join(__dirname, 'public', 'index.html')))
 })
+
+app.use('/api/', require('./api')(rooms))
 
 app.use('/test', ecstatic({
     root: path.join(__dirname, 'test'),
@@ -72,9 +77,12 @@ var server = http.createServer(app)
 
 var webSocketServer = new ws.Server({ server: server })
 
-var rooms = {};
-
 rooms['/room/main'] = createRoom()
+rooms['/room/main2'] = createRoom()
+rooms['/room/main3'] = createRoom()
+rooms['/room/main4'] = createRoom()
+rooms['/room/main5'] = createRoom()
+
 
 function createRoom() {
     var mp = makeCapturePoint({
@@ -111,8 +119,7 @@ function createRoom() {
                 .pipe(socket)
 
             socket
-                .pipe(es.mapSync(function (data) {
-                    return JSON.parse(data.toString('utf-8')) }))
+                .pipe(es.parse())
                 .pipe(player.createWriteStream())
             mp.entities.push(player)
             players++;
@@ -136,7 +143,7 @@ function createRoom() {
 webSocketServer.on('connection', function (ws) {
     var socketStream = websocketStream(ws)
 
-    var roomName = url.parse(ws.upgradeReq.url).path
+    var roomName = url.parse(ws.upgradeReq.url).pathname
     var isSpectate = /^\/spectate/.test(roomName)
     roomName = roomName.replace(/^\/spectate/, '')
     roomName = roomName.replace(/^\/|\/$/g, '')
