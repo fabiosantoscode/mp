@@ -36,6 +36,12 @@ html, body {
     image-rendering: pixelated;
 }
 
+.no-crisp-edges .game-canvas {
+    /* When there's no crisp edges support, only scale up to 4x */
+    max-width: 400px;
+    max-height: 400px;
+}
+
 .keyboard .left-buttons,
 .keyboard .right-buttons {
     position: absolute;
@@ -100,7 +106,7 @@ body.rooms {
 .homepage-spectate .playbtn {
     opacity: 0.2;
     transition: opacity 150ms linear;
-    transition-property: color, opacity;
+    transition-property: color, opacity, transform;
     color: black;
     text-shadow: 1px 1px 0 pink;
     position: absolute;
@@ -114,7 +120,13 @@ body.rooms {
     line-height: 25px;
     white-space: pre;
 }
-.homepage-spectate:hover .playbtn {
+
+.homepage-spectate .playbtn.going {
+    transform: scale(3)
+}
+
+.homepage-spectate:hover .playbtn,
+.homepage-spectate .playbtn.going {
     opacity: 0.8;
 }
 
