@@ -10,7 +10,6 @@ module.exports = function makeApi(rooms) {
     var fewAge
     function fewRooms() {
         if (fewAge !== undefined && +new Date - fewAge < 1000) { return fewShowing }
-        console.log(rooms)
         fewShowing = Object.keys(rooms)
             .sort(() => Math.random() - 0.5)  // shuffle
         fewAge = +new Date()

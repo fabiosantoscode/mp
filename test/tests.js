@@ -141,7 +141,6 @@ test('can shoot, spawns subclasses of Bullet', function () {
     mp.entities.push(player)
     player.shoot()
     equal(mp.entities.length, 2)
-    console.log(mp.entities)
     ok(mp.entities[1] instanceof mp.Bullet);
 })
 
