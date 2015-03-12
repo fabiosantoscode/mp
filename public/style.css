@@ -74,13 +74,13 @@ html, body {
 }
 
 @media screen and (orientation: portrait) {
-    .crisp-edges .game-canvas {
+    .game-canvas {
         width: 100%;
     }
 }
 
 @media screen and (orientation: landscape) {
-    .crisp-edges .game-canvas {
+    .game-canvas {
         height: 100vh;
     }
 }
