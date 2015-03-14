@@ -101,14 +101,11 @@ function createRoom() {
 
     return Object.freeze({
         addPlayer: function (socket) {
-            var PlayerClass = mp.getPlayerClass()
-            var player = new PlayerClass()
-            player.center = mp.getSpawnPoint(player)
-            socket.write(JSON.stringify([
-                'you', PlayerClass.name, player.serialize()]) + '\n')
+            var player
+            var playerWs
 
             main.createReadStream()
-                .pipe(makeCompressor(player, mp))
+                .pipe(makeCompressor(function () { return player }, mp))
                 .pipe(es.mapSync(function (data)  {
                     return data[0] === 'set3d' ?
                         [+new Date()].concat(data) :
@@ -118,13 +115,31 @@ function createRoom() {
                     return new Buffer(JSON.stringify(data) + '\n' , 'utf-8')}))
                 .pipe(socket)
 
-            socket
-                .pipe(es.parse())
-                .pipe(player.createWriteStream())
-            mp.entities.push(player)
+            var inputsStream = socket.pipe(es.parse())
+
             players++;
 
-            require('./lib/push-player-position.js')(player, socket)
+            function respawn() {
+                var PlayerClass = mp.getPlayerClass()
+                if (player) {
+                    mp.entities.remove(player)  // Just in case he's there
+                }
+                if (playerWs) {
+                    playerWs.destroy()
+                }
+                player = new PlayerClass()
+                player.center = mp.getSpawnPoint(player)
+                mp.entities.push(player)
+
+                socket.write(JSON.stringify([
+                    'you', PlayerClass.name, player.serialize()]) + '\n')
+
+                inputsStream.pipe((playerWs = player.createWriteStream()))
+            }
+
+            respawn()
+
+            require('./lib/push-player-position.js')(function () { return player }, socket)
 
             socket.on('close', function disconnectPlayer() {
                 players--
