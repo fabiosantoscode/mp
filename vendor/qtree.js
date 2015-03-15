@@ -244,11 +244,11 @@ function QuadTree(x, y, w, h, options) {
     function getter(overlapfun, node, obj, buf, strict, callback) {
         for( var li = 0; li < node.l.length; li++ )
             if( !strict || overlapfun(obj, node.l[li], buf) )
-                if( !callback(node.l[li]) )
+                if( !callback(node.l[li], { inside: 'l', index: li, node: node }) )
                     return false;
         for( var li = 0; li < node.c.length; li++ )
             if( !strict || overlapfun(obj, node.c[li], buf) )
-                if( !callback(node.c[li]) )
+                if( !callback(node.c[li], { inside: 'c', index: li, node: node }) )
                     return false;
         for( var ni = 0; ni < node.n.length; ni++ ) {
             if( overlapfun(obj, node.n[ni], buf) ) {
