@@ -51,7 +51,7 @@ app.use('/', function (req, res, next) {
 
 app.use('/room/', function (req, res) {
     res.setHeader('content-type', 'text/html;charset=utf-8')
-    if (rooms[url.parse(req.url).pathname] === undefined) {
+    if (rooms['/room' + url.parse(req.url).pathname] === undefined || !req.url) {
         res.status = 404
         res.end('<h1>404 room not found')
         return
