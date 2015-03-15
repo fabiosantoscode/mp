@@ -51,6 +51,11 @@ app.use('/', function (req, res, next) {
 
 app.use('/room/', function (req, res) {
     res.setHeader('content-type', 'text/html;charset=utf-8')
+    if (rooms[url.parse(req.url).pathname] === undefined) {
+        res.status = 404
+        res.end('<h1>404 room not found')
+        return
+    }
     res.end(fs.readFileSync(path.join(__dirname, 'public', 'index.html')))
 })
 
@@ -166,6 +171,11 @@ webSocketServer.on('connection', function (ws) {
     roomName = '/' + roomName
 
     var room = rooms[roomName]
+
+    if (!room) {
+        socketStream.end()
+        return
+    }
 
     if (isSpectate) {
         room.addSpectator(socketStream)
