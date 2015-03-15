@@ -35,7 +35,8 @@ var app = connect();
 
 
 app.use(require('compression')())
-app.use('/roomsbundle.js', serveBrowserify('./lib/rooms.js', true /* precache */))
+app.use('/presentationbundle.js', serveBrowserify('./lib/presentation.js'))
+app.use('/roomsbundle.js', serveBrowserify('./lib/rooms.js'))
 app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache */))
 app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js'))
 app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
