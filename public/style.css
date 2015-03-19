@@ -5,8 +5,14 @@ html, body {
     font-family: sans-serif;
 }
 
+body {
+    position: relative;
+}
+
 .weapon-info {
-    position: absolute
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
 }
 
 .weapon-info .weapon-ammo {
