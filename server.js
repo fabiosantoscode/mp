@@ -140,6 +140,11 @@ function createRoom() {
                 socket.write(JSON.stringify([
                     'you', PlayerClass.name, player.serialize()]) + '\n')
 
+                setTimeout(function func() {
+                    if (player.dead) return respawn()
+                    setTimeout(func, 1000)
+                })
+
                 inputsStream.pipe((playerWs = player.createWriteStream()))
             }
 
