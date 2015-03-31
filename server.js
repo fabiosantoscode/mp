@@ -125,25 +125,32 @@ function createRoom() {
 
             players++;
 
-            function respawn() {
-                var PlayerClass = mp.getPlayerClass()
+            function respawn(newPlayer) {
                 if (player) {
                     mp.entities.remove(player)  // Just in case he's there
                 }
                 if (playerWs) {
                     playerWs.destroy()
                 }
-                player = new PlayerClass()
+                if (!newPlayer) {
+                    var PlayerClass = mp.getPlayerClass()
+                    player = new PlayerClass()
+                } else {
+                    player = newPlayer
+                    var PlayerClass = player.constructor
+                }
+
                 player.center = mp.getSpawnPoint(player)
+
                 mp.entities.push(player)
 
                 socket.write(JSON.stringify([
                     'you', PlayerClass.name, player.serialize()]) + '\n')
 
-                setTimeout(function func() {
-                    if (player.dead) return respawn()
-                    setTimeout(func, 1000)
-                })
+                player.once('die', function () {
+                    if (mp.playerDead) mp.playerDead(player, respawn);
+                    else setTimeout(respawn, 1000)
+                });
 
                 inputsStream.pipe((playerWs = player.createWriteStream()))
             }
