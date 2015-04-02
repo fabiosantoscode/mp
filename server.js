@@ -94,6 +94,7 @@ function createRoom() {
     var mp = makeCapturePoint({
         mp: makeMp()
     })
+    mp.yRange = [-50, 100]
     var networld = new mp.Networld({ isServer: true })
     var main = makeMain({
         networld: networld,
