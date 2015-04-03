@@ -7,20 +7,18 @@ var path = require('path')
 var traceur = require('traceur/src/node/api.js');
 
 var thisRunID = +new Date()
+var thisRunDate = new Date().toUTCString();
 
 module.exports = function serveBrowserify(entryPoint, precache) {
     var cached = null
-    var traceurCached = null
     function getTraceur() {
-        if (!traceurCached) {
-            traceurCached = Buffer.concat([
-                fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
-                new Buffer(traceur.compile(cached.toString('utf-8')), 'utf-8')
-            ])
-        }
-        return traceurCached
+        return Buffer.concat([
+            fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
+            new Buffer(traceur.compile(cached.toString('utf-8')), 'utf-8')
+        ])
     }
     function getBrowserified(cb) {
+        if (cached) { return cb(cached) }
         var b = browserify({
             entries: [entryPoint],
             debug: false,
@@ -32,31 +30,32 @@ module.exports = function serveBrowserify(entryPoint, precache) {
             if (err) {
                 return console.error('/* Error in serveBrowserify! */', err);
             }
+            cached = body
             cb && cb(body)
         }))
     }
 
-    if (precache) cached = getBrowserified(null)  // Warm up the cache
+    if (precache) setTimeout(function () {
+        getBrowserified(null)  // Warm up the cache
+    })
     return function serveBrowserify(req, res) {
         if (+req.headers['if-none-match'] === thisRunID) {
             res.statusCode = 304
             res.end()
             return
         }
+        if (req.headers['if-modified-since'] && +new Date(req.headers['if-modified-since']) >= thisRunID) {
+            res.statusCode = 404; res.end(); return
+        }
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
         res.setHeader('etag', thisRunID)
+        res.setHeader('cache-control', 'public;max-age=3600')
+        res.setHeader('last-modified', thisRunDate)
 
         var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
 
-        if (!cached) {
-            return getBrowserified(function (body) {
-                cached = body
-                res.end(useTraceur ? getTraceur() : cached)
-            })
-        }
-
-        res.end(useTraceur ?
-            getTraceur() :
-            cached)
+        getBrowserified(function (body) {
+            res.end(useTraceur ? getTraceur(body) : body)
+        })
     }
 }
