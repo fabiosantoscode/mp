@@ -7,6 +7,7 @@ var fs = require('fs');
 
 var ws = require('ws');
 var es = require('event-stream');
+var makeSanitizer = require('./lib/sanitize.js');
 var serveBrowserify = require('./serve-browserify.js')
 var websocketStream = require('websocket-stream');
 var ecstatic = require('ecstatic');
@@ -122,7 +123,9 @@ function createRoom() {
                     return new Buffer(JSON.stringify(data) + '\n' , 'utf-8')}))
                 .pipe(socket)
 
-            var inputsStream = socket.pipe(es.parse())
+            var inputsStream = socket
+                .pipe(makeSanitizer())
+                .pipe(es.parse())
 
             players++;
 
