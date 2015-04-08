@@ -138,7 +138,7 @@ function createRoom(opt) {
     return room = Object.freeze({
         players: [],
         addPlayer: function (socket) {
-            if (players + 1 > opt.maxPlayers) return socket.end('["too many cooks"]')
+            if (players + 1 > opt.maxPlayers) return socket.end('["fatal", "too many players"]\n')
 
             var player
             var playerWs

@@ -150,3 +150,21 @@ body.rooms {
 }
 
 
+.game-notice {
+    position: fixed;
+    top: 0;
+    left: 20vh;
+    right: 20vh;
+    text-align: center;
+    background-color: red;
+    color: white;
+    opacity: 0.8;
+    padding: 5vh;
+    box-shadow: 0 0 4px black;
+    margin: 2vh;
+}
+
+.game-notice.good-notice {
+    background-color: green;
+}
+
