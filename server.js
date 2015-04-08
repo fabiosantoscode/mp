@@ -1,5 +1,6 @@
 'use strict';
 
+var assert = require('assert')
 var events = require('events');
 var path = require('path');
 var http = require('http');
@@ -92,10 +93,15 @@ rooms['/room/main'] = createRoom()
 // rooms['/room/main5'] = createRoom()
 
 
-function createRoom() {
+function createRoom(opt) {
+    opt = opt || {}
     var mp
     var networld
     var main
+
+    opt.maxPlayers = opt.maxPlayers || 255
+    assert(opt.maxPlayers > 0)
+    assert(opt.maxPlayers <= 255)
 
     var newRound = function () {
         if (mp) {
@@ -122,6 +128,7 @@ function createRoom() {
     }
 
     var roomEvents = new events.EventEmitter()
+    roomEvents.setMaxListeners(255)
 
     newRound()
 
@@ -131,11 +138,15 @@ function createRoom() {
     return room = Object.freeze({
         players: [],
         addPlayer: function (socket) {
+            if (players + 1 > opt.maxPlayers) return socket.end('["too many cooks"]')
+
             var player
             var playerWs
 
-            main.createReadStream()
-                .pipe(makeCompressor(function () { return player }, mp))
+            var mainStreamCompressor = makeCompressor(function () { return player }, mp)
+            var mainRs = main.createReadStream()
+            mainRs
+                .pipe(mainStreamCompressor)
                 .pipe(es.mapSync(function (data)  {
                     return data[0] === 'set3d' ?
                         [+new Date()].concat(data) :
@@ -184,13 +195,23 @@ function createRoom() {
                 if (playerWs) {
                     playerWs.destroy()
                 }
+                if (inputsStream) {
+                    inputsStream.end()
+                }
+                if (mainRs) {
+                    mainRs.unpipe()
+                    mainRs.destroy()
+                }
+                if (mainStreamCompressor) {
+                    mainStreamCompressor.destroy()
+                }
             }
 
             respawn()
 
             require('./lib/push-player-position.js')(function () { return player }, socket)
 
-            roomEvents.on('end-round', destroy)
+            roomEvents.once('end-round', destroy)
 
             socket.on('close', function disconnectPlayer() {
                 players--
