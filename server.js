@@ -1,5 +1,6 @@
 'use strict';
 
+var events = require('events');
 var path = require('path');
 var http = require('http');
 var url = require('url');
@@ -85,10 +86,10 @@ var server = http.createServer(app)
 var webSocketServer = new ws.Server({ server: server })
 
 rooms['/room/main'] = createRoom()
-rooms['/room/main2'] = createRoom()
-rooms['/room/main3'] = createRoom()
-rooms['/room/main4'] = createRoom()
-rooms['/room/main5'] = createRoom()
+// rooms['/room/main2'] = createRoom()
+// rooms['/room/main3'] = createRoom()
+// rooms['/room/main4'] = createRoom()
+// rooms['/room/main5'] = createRoom()
 
 
 function createRoom() {
@@ -97,6 +98,14 @@ function createRoom() {
     var main
 
     var newRound = function () {
+        if (mp) {
+            mp.entities.forEach(function (ent) { mp.entities.remove(ent) })
+            mp.destroy()
+            roomEvents.emit('end-round')
+        }
+        if (networld) networld.destroy()
+        if (main) main.destroy()
+
         mp = makeCapturePoint({
             mp: makeMp()
         })
@@ -112,11 +121,15 @@ function createRoom() {
         worldGen({ mp: mp })
     }
 
+    var roomEvents = new events.EventEmitter()
+
     newRound()
 
     var players = 0
 
-    return Object.freeze({
+    var room
+    return room = Object.freeze({
+        players: [],
         addPlayer: function (socket) {
             var player
             var playerWs
@@ -139,12 +152,8 @@ function createRoom() {
             players++;
 
             function respawn(newPlayer) {
-                if (player) {
-                    mp.entities.remove(player)  // Just in case he's there
-                }
-                if (playerWs) {
-                    playerWs.destroy()
-                }
+                if (player) destroy()
+
                 if (!newPlayer) {
                     var PlayerClass = mp.getPlayerClass()
                     player = new PlayerClass()
@@ -168,13 +177,24 @@ function createRoom() {
                 inputsStream.pipe((playerWs = player.createWriteStream()))
             }
 
+            function destroy() {
+                if (player) {
+                    mp.entities.remove(player)  // Just in case he's there
+                }
+                if (playerWs) {
+                    playerWs.destroy()
+                }
+            }
+
             respawn()
 
             require('./lib/push-player-position.js')(function () { return player }, socket)
 
+            roomEvents.on('end-round', destroy)
+
             socket.on('close', function disconnectPlayer() {
                 players--
-                mp.entities.remove(player)
+                destroy()
             })
         },
         addSpectator: function (socket) {
