@@ -163,7 +163,7 @@ function createRoom(opt) {
             players++;
 
             function respawn(newPlayer) {
-                if (player) destroy()
+                if (player) { mp.entities.remove(player); playerWs.destroy(); }
 
                 if (!newPlayer) {
                     var PlayerClass = mp.getPlayerClass()
@@ -216,6 +216,7 @@ function createRoom(opt) {
             socket.on('close', function disconnectPlayer() {
                 players--
                 destroy()
+                roomEvents.removeListener('end-round', destroy)
             })
         },
         addSpectator: function (socket) {
