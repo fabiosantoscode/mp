@@ -92,19 +92,28 @@ rooms['/room/main5'] = createRoom()
 
 
 function createRoom() {
-    var mp = makeCapturePoint({
-        mp: makeMp()
-    })
-    mp.yRange = [-50, 100]
-    var networld = new mp.Networld({ isServer: true })
-    var main = makeMain({
-        networld: networld,
-        isServer: true,
-        mp: mp,
-        camera: null,
-        debugInfo: DEBUG === true,
-    })
-    worldGen({ mp: mp })
+    var mp
+    var networld
+    var main
+
+    var newRound = function () {
+        mp = makeCapturePoint({
+            mp: makeMp()
+        })
+        mp.yRange = [-50, 100]
+        networld = new mp.Networld({ isServer: true })
+        main = makeMain({
+            networld: networld,
+            isServer: true,
+            mp: mp,
+            camera: null,
+            debugInfo: DEBUG === true,
+        })
+        worldGen({ mp: mp })
+    }
+
+    newRound()
+
     var players = 0
 
     return Object.freeze({
