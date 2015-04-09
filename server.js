@@ -125,6 +125,8 @@ function createRoom(opt) {
             debugInfo: DEBUG === true,
         })
         worldGen({ mp: mp })
+        mp.askForNewRound = newRound
+        roomEvents.emit('new-round')
     }
 
     var roomEvents = new events.EventEmitter()
