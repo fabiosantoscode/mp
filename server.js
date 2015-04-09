@@ -184,7 +184,7 @@ function createRoom(opt) {
 
                 player.once('die', function () {
                     if (mp.playerDead) mp.playerDead(player, respawn);
-                    else setTimeout(respawn, 1000)
+                    else mp.setTimeout(respawn, 1000)
                 });
 
                 inputsStream.pipe((playerWs = player.createWriteStream()))
