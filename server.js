@@ -105,9 +105,7 @@ function createRoom(opt) {
 
     var newRound = function () {
         if (mp) {
-            mp.entities.forEach(function (ent) { mp.entities.remove(ent) })
             mp.destroy()
-            roomEvents.emit('end-round')
         }
         if (networld) networld.destroy()
         if (main) main.destroy()
@@ -126,7 +124,7 @@ function createRoom(opt) {
         })
         worldGen({ mp: mp })
         mp.askForNewRound = newRound
-        roomEvents.emit('new-round')
+        roomEvents.emit('end-round')
     }
 
     var roomEvents = new events.EventEmitter()
@@ -145,27 +143,31 @@ function createRoom(opt) {
             var player
             var playerWs
 
-            var mainStreamCompressor = makeCompressor(function () { return player }, mp)
-            var mainRs = main.createReadStream()
-            mainRs
-                .pipe(mainStreamCompressor)
-                .pipe(es.mapSync(function (data)  {
-                    return data[0] === 'set3d' ?
-                        [+new Date()].concat(data) :
-                        data
-                }))
-                .pipe(es.mapSync(function (data) {
-                    return new Buffer(JSON.stringify(data) + '\n' , 'utf-8')}))
-                .pipe(socket)
-
-            var inputsStream = socket
-                .pipe(makeSanitizer())
-                .pipe(es.parse())
+            var mainStreamCompressor
+            var mainRs
 
             players++;
 
+            function newMain() {
+                mainStreamCompressor = makeCompressor(function () { return player }, mp)
+                mainRs = main.createReadStream()
+                mainRs
+                    .pipe(mainStreamCompressor)
+                    .pipe(es.mapSync(function (data)  {
+                        return data[0] === 'set3d' ?
+                            [+new Date()].concat(data) :
+                            data
+                    }))
+                    .pipe(es.mapSync(function (data) {
+                        return new Buffer(JSON.stringify(data) + '\n' , 'utf-8')}))
+                    .pipe(socket)
+
+                player = null
+            }
+
             function respawn(newPlayer) {
-                if (player) { mp.entities.remove(player); playerWs.destroy(); }
+                if (playerWs) { playerWs.destroy() }
+                if (player) { mp.entities.remove(player) }
 
                 if (!newPlayer) {
                     var PlayerClass = mp.getPlayerClass()
@@ -187,38 +189,48 @@ function createRoom(opt) {
                     else mp.setTimeout(respawn, 1000)
                 });
 
-                inputsStream.pipe((playerWs = player.createWriteStream()))
+                socket.unpipe()
+                socket.pipe(makeSanitizer()).pipe(es.parse()).pipe((playerWs = player.createWriteStream()))
             }
 
             function destroy() {
                 if (player) {
-                    mp.entities.remove(player)  // Just in case he's there
+                    if (playerWs) {
+                        playerWs.destroy()
+                    }
                 }
-                if (playerWs) {
-                    playerWs.destroy()
-                }
-                if (inputsStream) {
-                    inputsStream.end()
-                }
+
                 if (mainRs) {
                     mainRs.unpipe()
                     mainRs.destroy()
                 }
-                if (mainStreamCompressor) {
+
+                if (mainStreamCompressor)
                     mainStreamCompressor.destroy()
-                }
             }
 
+            newMain()
             respawn()
 
             require('./lib/push-player-position.js')(function () { return player }, socket)
 
-            roomEvents.once('end-round', destroy)
+            roomEvents.once('end-round', function thisFunc() {
+                destroy()
+
+                socket.write('["reconnect me"]\n')
+
+                newMain()
+                respawn()
+
+                roomEvents.once('end-round', thisFunc)
+            })
 
             socket.on('close', function disconnectPlayer() {
                 players--
                 destroy()
-                roomEvents.removeListener('end-round', destroy)
+                if (inputsStream) {
+                    inputsStream.end()
+                }
             })
         },
         addSpectator: function (socket) {
