@@ -42,8 +42,6 @@ app.use('/presentationbundle.js', serveBrowserify('./lib/presentation.js'))
 app.use('/roomsbundle.js', serveBrowserify('./lib/rooms.js'))
 app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache */))
 app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js'))
-app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
-app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
 
 app.use('/', function (req, res, next) {
     if (url.parse(req.url).pathname !== '/') return next()
@@ -133,7 +131,8 @@ function createRoom(opt) {
     return room = Object.freeze({
         players: [],
         addPlayer: function (socket) {
-            if (players + 1 > opt.maxPlayers) return socket.end('["fatal", "too many players"]\n')
+            if (players + 1 > opt.maxPlayers)
+                return socket.end('["fatal", "too many players"]\n')
 
             var player
             var playerWs
