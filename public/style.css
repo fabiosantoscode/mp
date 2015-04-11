@@ -1,6 +1,14 @@
 
+* {
+    -moz-user-select: none;
+    user-select: none;
+    cursor: default;
+    text-transform: uppercase;
+}
+
 html, body {
     height: 100%;
+    background: #333;
 }
 
 html, body {
@@ -14,9 +22,10 @@ body {
 }
 
 .weapon-info {
+    background-color: #fef;
     position: absolute;
+    padding: 1em;
     z-index: 2;
-    pointer-events: none;
 }
 
 .weapon-info .weapon-ammo {
@@ -86,7 +95,7 @@ body {
     line-height: 1em;
     text-align: center;
     z-index: 1;
-    background: rgba(255, 255, 255, 0.5);
+    background: white;
 }
 
 @media screen and (orientation: portrait) {
@@ -117,7 +126,6 @@ body.rooms {
     opacity: 0.2;
     transition: opacity 150ms linear;
     transition-property: color, opacity, transform;
-    color: black;
     text-shadow: 1px 1px 0 pink;
     position: absolute;
     top:0;left:0;right:0;bottom:0;
@@ -132,7 +140,7 @@ body.rooms {
 }
 
 .homepage-spectate .playbtn.going {
-    transform: scale(3)
+    transform: scale(3);
     opacity: 0;
 }
 
@@ -160,6 +168,7 @@ body.rooms {
     color: white;
     opacity: 0.8;
     padding: 5vh;
+    z-index: 6;
     box-shadow: 0 0 4px black;
     margin: 2vh;
 }
@@ -168,3 +177,63 @@ body.rooms {
     background-color: green;
 }
 
+
+.scoreboard:before {
+    display: block;
+    content: 'SCORES';
+    margin: 1em 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.scoreboard {
+    display: block !important;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 3;
+    width: 80vw;
+    height: 80vh;
+    margin-right: 10vw;
+    margin-top: 10vh;
+    overflow-y: scroll;
+    transition: margin-top 400ms linear;
+    background-color: white;
+}
+
+.scoreboard[hidden] {
+    margin-top: -100%;
+}
+
+.scoreboard table {
+    table-layout: fixed;
+    margin: 5vmin;
+    background-color: #fea;
+}
+
+.scoreboard td {
+    width: 40vw;
+}
+
+.scoreboard td + td {
+    width: 40vw;
+}
+
+.scoreboard:not([hidden]) + canvas {
+    filter: blur(2px);
+}
+
+.scoreboard-toggle {
+    background-color: #fef;
+    display: block;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+}
+
+.scoreboard-toggle:after {
+    display: block;
+    content: 'scores';
+    padding: 1em;
+}

@@ -25,6 +25,7 @@ var makeClockSync = require('./lib/clock-sync')
 var worldGen = require('./lib/worldgen.js')
 var makeCompressor = require('./lib/netcompressor.js')
 var makeCapturePoint = require('./lib/capture-point.js')
+var makeScoreboard = require('./lib/scoreboard.js')
 var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
 
@@ -91,6 +92,9 @@ function createRoom(opt) {
     var mp
     var networld
     var main
+    var scoreboard
+
+    var gameStartTime = +new Date()
 
     opt.maxPlayers = opt.maxPlayers || 255
     assert(opt.maxPlayers > 0)
@@ -118,6 +122,7 @@ function createRoom(opt) {
         worldGen({ mp: mp })
         mp.askForNewRound = newRound
         roomEvents.emit('end-round')
+        scoreboard = makeScoreboard({ mp: mp })
     }
 
     var roomEvents = new events.EventEmitter()
@@ -125,6 +130,7 @@ function createRoom(opt) {
 
     newRound()
 
+    var playerIds = 0
     var players = 0
 
     var room
@@ -133,6 +139,8 @@ function createRoom(opt) {
         addPlayer: function (socket) {
             if (players + 1 > opt.maxPlayers)
                 return socket.end('["fatal", "too many players"]\n')
+
+            var playerId = ++playerIds
 
             var player
             var playerWs
@@ -172,6 +180,7 @@ function createRoom(opt) {
                 }
 
                 player.center = mp.getSpawnPoint(player)
+                player.playerId = playerId
 
                 mp.entities.push(player)
 
@@ -208,6 +217,8 @@ function createRoom(opt) {
 
             require('./lib/push-player-position.js')(function () { return player }, socket)
 
+            scoreboard.add(playerId)
+
             roomEvents.once('end-round', function thisFunc() {
                 destroy()
 
@@ -222,6 +233,7 @@ function createRoom(opt) {
             socket.on('close', function disconnectPlayer() {
                 players--
                 destroy()
+                scoreboard.remove(playerId)
                 if (player) { mp.entities.remove(player) }
             })
         },
