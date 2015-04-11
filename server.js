@@ -44,7 +44,6 @@ app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache 
 app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js'))
 app.use('/multiplayertestbundle.js', serveBrowserify('./lib/multiplayertest.js'))
 app.use('/singleplayerbundle.js', serveBrowserify('./lib/singleplayer.js'))
-app.use('/test/testbundle.js', serveBrowserify('./test/tests.js'))
 
 app.use('/', function (req, res, next) {
     if (url.parse(req.url).pathname !== '/') return next()
@@ -63,10 +62,6 @@ app.use('/room/', function (req, res) {
 })
 
 app.use('/api/', require('./api')(rooms))
-
-app.use('/test', ecstatic({
-    root: path.join(__dirname, 'test'),
-}));
 
 app.use('/spectate', function (req, res) {
     res.setHeader('content-type', 'text/html;charset=utf-8')
