@@ -228,6 +228,7 @@ function createRoom(opt) {
             socket.on('close', function disconnectPlayer() {
                 players--
                 destroy()
+                if (player) { mp.entities.remove(player) }
             })
         },
         addSpectator: function (socket) {
