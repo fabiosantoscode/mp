@@ -206,7 +206,7 @@ body.rooms a, body.rooms a:visited {
 }
 
 .scoreboard[hidden] {
-    margin-top: -100%;
+    margin-top: -100vh;
 }
 
 .scoreboard table {
@@ -223,8 +223,8 @@ body.rooms a, body.rooms a:visited {
     width: 40vw;
 }
 
-.scoreboard:not([hidden]) + canvas {
-    filter: blur(2px);
+.scoreboard {
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 }
 
 .scoreboard-toggle {
