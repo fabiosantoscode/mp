@@ -9,7 +9,9 @@ var traceur = require('traceur/src/node/api.js');
 var thisRunID = +new Date()
 var thisRunDate = new Date().toUTCString();
 
-module.exports = function serveBrowserify(entryPoint, precache) {
+module.exports = function serveBrowserify(entryPoint, opt) {
+    opt = opt || {}
+    var precache = !!opt.precache
     var cached = null
     function getTraceur() {
         return Buffer.concat([

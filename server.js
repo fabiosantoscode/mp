@@ -39,10 +39,10 @@ var app = connect();
 
 
 app.use(require('compression')())
-app.use('/presentationbundle.js', serveBrowserify('./lib/presentation.js'))
-app.use('/roomsbundle.js', serveBrowserify('./lib/rooms.js'))
-app.use('/clientbundle.js', serveBrowserify('./lib/client.js', true /* precache */))
-app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js'))
+app.use('/presentationbundle.js', serveBrowserify('./lib/presentation.js', { precache: false, debug: DEBUG }))
+app.use('/roomsbundle.js', serveBrowserify('./lib/rooms.js', { precache: false, debug: DEBUG }))
+app.use('/clientbundle.js', serveBrowserify('./lib/client.js', { precache: true, debug: DEBUG }))
+app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js', { precache: false, debug: DEBUG }))
 
 app.use('/', function (req, res, next) {
     if (url.parse(req.url).pathname !== '/') return next()
