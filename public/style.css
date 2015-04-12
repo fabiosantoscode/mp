@@ -201,7 +201,7 @@ body.rooms a, body.rooms a:visited {
     margin-right: 10vw;
     margin-top: 10vh;
     overflow-y: scroll;
-    transition: margin-top 400ms linear;
+    transition: margin-top 100ms ease-in;
     background-color: white;
 }
 
