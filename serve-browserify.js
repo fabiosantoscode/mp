@@ -54,7 +54,7 @@ module.exports = function serveBrowserify(entryPoint, opt) {
             return
         }
         if (req.headers['if-modified-since'] && +new Date(req.headers['if-modified-since']) >= thisRunID) {
-            res.statusCode = 404; res.end(); return
+            res.statusCode = 304; res.end(); return
         }
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
         res.setHeader('etag', thisRunID)
