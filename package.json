@@ -31,6 +31,7 @@
     "simple-quadtree": "^0.1.2",
     "through2": "^0.6.1",
     "traceur": "0.0.79",
+    "uglify-js": "git://github.com/fabiosantoscode/UglifyJS2#harmony",
     "uniq-stream": "0.0.2",
     "websocket-stream": "^1.4.0",
     "ws": "^0.4.32",

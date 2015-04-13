@@ -18,7 +18,7 @@ var traceurRequire = require('traceur/src/node/require.js');
 
 traceurRequire.makeDefault(function (filename) {
     // Files in ./lib are es6
-    return !/node_modules/.test(filename)
+    return !/node_modules/.test(filename) && filename.indexOf(__dirname) !== -1
 })
 
 var makeClockSync = require('./lib/clock-sync')

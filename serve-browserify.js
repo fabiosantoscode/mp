@@ -2,6 +2,7 @@
 
 var es = require('event-stream');
 var browserify = require('browserify');
+var UglifyJS = require('uglify-js');
 var fs = require('fs')
 var path = require('path')
 var traceur = require('traceur/src/node/api.js');
@@ -23,7 +24,7 @@ module.exports = function serveBrowserify(entryPoint, opt) {
         if (cached) { return cb(cached) }
         var b = browserify({
             entries: [entryPoint],
-            debug: false,
+            debug: !!opt.debug,
             insertGlobals: true,
         })
         var bun = b.bundle()
@@ -31,6 +32,12 @@ module.exports = function serveBrowserify(entryPoint, opt) {
         bun.pipe(es.wait(function (err, body) {
             if (err) {
                 return console.error('/* Error in serveBrowserify! */', err);
+            }
+            if (!opt.debug) {
+                body = UglifyJS.minify(body.toString('utf-8'), {
+                    fromString: true,
+                    warnings: true
+                }).code
             }
             cached = body
             cb && cb(body)
