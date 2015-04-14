@@ -223,6 +223,40 @@ body.rooms a, body.rooms a:visited {
     width: 40vw;
 }
 
+.rooms-list {
+    min-height: 200px;
+    min-height: calc(200px + 2em /* two .homepage-spectate margins */);
+}
+
+.rooms-list.loading {
+    line-height: 200px;
+    vertical-align: middle;
+}
+
+.rooms-list.loading:after {
+    display: inline-block;
+    content: "...";
+    overflow: hidden;
+    position: absolute;
+    text-align: left;
+    width: 1em;
+    animation: loadingdots 2s infinite ease-out;
+}
+
+@keyframes loadingdots {
+    0% {
+        width: 0px;
+    }
+    50% {
+        width: 1.2em;
+    }
+    100% {
+        width: 0px;
+    }
+}
+
+
+
 .scoreboard {
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 }
