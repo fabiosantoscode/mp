@@ -60,7 +60,7 @@ module.exports = function serveBrowserify(entryPoint, opt) {
         }
         res.setHeader('content-type', 'text/javascript; charset=utf-8')
         res.setHeader('etag', thisRunID)
-        res.setHeader('cache-control', 'public;max-age=3600')
+        res.setHeader('cache-control', 'max-age=36000, public, must-revalidate')
         res.setHeader('last-modified', thisRunDate)
 
         var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
