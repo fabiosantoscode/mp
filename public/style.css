@@ -112,6 +112,10 @@ body {
 body.rooms {
     color: white;
     text-align: center;
+
+    /* Hide the canvas going off to the right of the screen */
+    width: 100vw;
+    overflow: hidden;
 }
 
 body.rooms a, body.rooms a:visited {
