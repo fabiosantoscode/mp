@@ -25,7 +25,7 @@ module.exports = function serveBrowserify(entryPoint, opt) {
         var b = browserify({
             entries: [entryPoint],
             debug: !!opt.debug,
-            insertGlobals: true,
+            insertGlobals: !opt.debug,
         })
         var bun = b.bundle()
 
@@ -36,10 +36,12 @@ module.exports = function serveBrowserify(entryPoint, opt) {
             if (!opt.debug) {
                 body = UglifyJS.minify(body.toString('utf-8'), {
                     fromString: true,
-                    warnings: true
+                    unsafe: true,
+                    warnings: false
                 }).code
             }
-            cached = body
+            if (opt.debug)  // Don't waste this ram in production
+                cached = body
             cb && cb(body)
         }))
     }
