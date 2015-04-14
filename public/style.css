@@ -259,7 +259,9 @@ body.rooms a, body.rooms a:visited {
     }
 }
 
-
+.player-greeting {
+    font-weight: bold;
+}
 
 .scoreboard {
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);

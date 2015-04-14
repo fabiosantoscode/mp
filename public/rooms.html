@@ -7,20 +7,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <link rel="stylesheet" href="/style.css">
 
+<h1>MP</h1>
+
 <canvas id=mainCanvas class=presentation-canvas height=100 width=500></canvas>
 <script src=/feature-detect.js></script>
 <script>
 loadMaybeHarmony('/presentationbundle.js')
 </script>
 
-<h1>Capture point rooms:</h1>
+<h2>Nickname</h2>
+<p>It's optional, but you can write a nickname:
+<input id="gamename"
+    placeholder="My Nickname"
+    maxlength=30
+>
+</p>
 
-<p>Pick one where there seems to be people to play with.</p>
+<h2>rooms:</h2>
+
+<p><span class="player-greeting" id="greeting"></span> Pick one where there seems to be people to play with.</p>
 
 <div id="multiplayer-rooms" class="rooms-list"></div>
-
-<h1>Play alone</h1>
-
-<p>You can also <a href="/singleplayer.html">play alone</a> if you like.</p>
 
 <script src="/roomsbundle.js" async></script>
