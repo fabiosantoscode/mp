@@ -68,6 +68,7 @@ app.use('/spectate', function (req, res) {
 })
 
 app.use('/', ecstatic({
+    cache: 36000,
     root: path.join(__dirname, 'public'),
 }));
 
