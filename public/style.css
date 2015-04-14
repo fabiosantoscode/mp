@@ -279,3 +279,25 @@ body.rooms a, body.rooms a:visited {
     content: 'scores';
     padding: 1em;
 }
+
+@keyframes game-presentation-marquee {
+    0% {
+        margin-left: 0;
+    }
+    10% {
+        margin-left: 0;
+    }
+    50% {
+        margin-left: calc(100vw - 500px);
+    }
+    60% {
+        margin-left: calc(100vw - 500px);
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .presentation-canvas {
+        animation: game-presentation-marquee 40s infinite linear;
+    }
+}
+
