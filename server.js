@@ -145,6 +145,8 @@ function createRoom(opt) {
             var player
             var playerWs
 
+            var name
+
             var mainStreamCompressor
             var mainRs
 
@@ -193,7 +195,13 @@ function createRoom(opt) {
                 });
 
                 socket.unpipe()
-                socket.pipe(makeSanitizer()).pipe(es.parse()).pipe((playerWs = player.createWriteStream()))
+                socket.pipe(makeSanitizer())
+                    .pipe(es.parse())
+                    .on('data', function (data) {
+                        if (data[0] === 'my-name' && data[1])
+                            setName(data[1])
+                    })
+                    .pipe((playerWs = player.createWriteStream()))
             }
 
             function destroy() {
@@ -218,6 +226,10 @@ function createRoom(opt) {
             require('./lib/push-player-position.js')(function () { return player }, socket)
 
             scoreboard.add(playerId)
+
+            function setName(name) {
+                scoreboard.setName(playerId, name)
+            }
 
             roomEvents.once('end-round', function thisFunc() {
                 destroy()
