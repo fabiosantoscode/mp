@@ -14,10 +14,10 @@ module.exports = function serveBrowserify(entryPoint, opt) {
     opt = opt || {}
     var precache = !!opt.precache
     var cached = null
-    function getTraceur() {
+    function getTraceur(body) {
         return Buffer.concat([
             fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
-            new Buffer(traceur.compile(cached.toString('utf-8')), 'utf-8')
+            new Buffer(traceur.compile(body.toString('utf-8')), 'utf-8')
         ])
     }
     function getBrowserified(cb) {
