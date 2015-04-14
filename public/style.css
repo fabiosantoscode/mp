@@ -115,7 +115,7 @@ body.rooms {
 
     /* Hide the canvas going off to the right of the screen */
     width: 100vw;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 body.rooms a, body.rooms a:visited {
