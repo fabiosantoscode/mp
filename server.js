@@ -164,7 +164,6 @@ function createRoom(opt) {
                             data
                     }))
                     .pipe(es.mapSync(function (data) {
-                        console.log(JSON.stringify(data))
                         data = JSON.stringify(data, function replacer(_, value) {
                             return value == 'number' ?
                                 Number((value+'')
