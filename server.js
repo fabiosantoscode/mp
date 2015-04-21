@@ -164,7 +164,15 @@ function createRoom(opt) {
                             data
                     }))
                     .pipe(es.mapSync(function (data) {
-                        return new Buffer(JSON.stringify(data) + '\n' , 'utf-8')}))
+                        console.log(JSON.stringify(data))
+                        data = JSON.stringify(data, function replacer(_, value) {
+                            return value == 'number' ?
+                                Number((value+'')
+                                    .replace(/(-?\d+\.\d\d)\d+/g, '$1')) :
+                                value
+                            })
+                        return new Buffer(data + '\n', 'utf-8')
+                    }))
                     .pipe(socket)
 
                 player = null
