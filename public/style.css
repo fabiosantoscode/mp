@@ -33,6 +33,32 @@ body {
     transition: transform ease 1s;
 }
 
+
+.weapon-img {
+    margin-top: -1em;
+    margin-bottom: -1em;
+    height: 3em;
+
+    image-rendering: -moz-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.weapon-img:not([hidden]) {
+    animation: 2s weapon-showoff;
+    display: inline-block;
+}
+
+@keyframes weapon-showoff {
+    0% { transform: rotate(-20deg); }
+    50% {
+        transform: rotate(20deg) translate(20vw, 20vh) scale(3);
+    }
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
+}
+
 .keyboard * {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
