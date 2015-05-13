@@ -220,7 +220,7 @@ body.rooms a, body.rooms a:visited {
     text-align: center;
 }
 
-.scoreboard {
+.ui-panel {
     display: block !important;
     position: fixed;
     right: 0;
@@ -235,7 +235,7 @@ body.rooms a, body.rooms a:visited {
     background-color: white;
 }
 
-.scoreboard[hidden] {
+.ui-panel[hidden] {
     margin-top: -100vh;
 }
 
