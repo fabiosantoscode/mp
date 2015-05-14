@@ -230,13 +230,27 @@ body.rooms a, body.rooms a:visited {
     height: 80vh;
     margin-right: 10vw;
     margin-top: 10vh;
-    overflow-y: scroll;
+    overflow-y: auto;
     transition: margin-top 100ms ease-in;
     background-color: white;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 }
 
 .ui-panel[hidden] {
     margin-top: -100vh;
+}
+
+.ui-panel-toggle {
+    background-color: #fef;
+    display: block;
+    position: fixed;
+    z-index: 1;
+}
+
+.ui-panel-toggle:after {
+    display: block;
+    content: 'ui panel';
+    padding: 1em;
 }
 
 .scoreboard table {
@@ -289,23 +303,41 @@ body.rooms a, body.rooms a:visited {
     font-weight: bold;
 }
 
-.scoreboard {
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
+.settings-panel {
+    text-align: center;
+}
+.settings-panel button {
+    border: 2px solid black;
+    display: block;
+    background: #fea;
+    color: black;
+    margin: 1em auto;
+}
+.settings-panel button:hover {
+    background: white;
+}
+.settings-panel button:first-child {
+    margin-top: 4em;
+}
+
+
+.settings-panel-toggle {
+    z-index: 1;
+    top: 3em;
+    right: 0;
+}
+
+.settings-panel-toggle:after {
+    content: 'settings';
 }
 
 .scoreboard-toggle {
-    background-color: #fef;
-    display: block;
-    position: fixed;
-    z-index: 1;
     top: 0;
     right: 0;
 }
 
 .scoreboard-toggle:after {
-    display: block;
     content: 'scores';
-    padding: 1em;
 }
 
 @keyframes game-presentation-marquee {
