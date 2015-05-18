@@ -34,15 +34,21 @@ var DEBUG = process.argv.indexOf('--debug') !== -1
 
 var rooms = {}
 
+var toBrowserify = require('./server/browserify-bundles.json')
+
 var app = connect();
 
 
 
 app.use(require('compression')())
-app.use('/presentationbundle.js', serveBrowserify('./lib/presentation.js', { precache: false, debug: DEBUG }))
-app.use('/roomsbundle.js', serveBrowserify('./lib/rooms.js', { precache: false, debug: DEBUG }))
-app.use('/clientbundle.js', serveBrowserify('./lib/client.js', { precache: true, debug: DEBUG }))
-app.use('/spectatebundle.js', serveBrowserify('./lib/spectate.js', { precache: false, debug: DEBUG }))
+
+for (var bundleName in toBrowserify) {
+    app.use(
+        bundleName,
+        serveBrowserify(toBrowserify[bundleName], {
+            precache: false, debug: DEBUG
+        }))
+}
 
 app.use('/', function (req, res, next) {
     if (url.parse(req.url).pathname !== '/') return next()

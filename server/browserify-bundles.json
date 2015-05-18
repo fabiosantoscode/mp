@@ -1,0 +1,6 @@
+{
+    "/presentationbundle.js": "./lib/presentation.js",
+    "/roomsbundle.js": "./lib/rooms.js",
+    "/clientbundle.js": "./lib/client.js",
+    "/spectatebundle.js": "./lib/spectate.js"
+}
