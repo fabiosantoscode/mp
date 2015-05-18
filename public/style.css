@@ -231,7 +231,7 @@ body.rooms a, body.rooms a:visited {
     margin-right: 10vw;
     margin-top: 10vh;
     overflow-y: auto;
-    transition: margin-top 100ms ease-in;
+    transition: margin-top 50ms linear;
     background-color: white;
     box-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 }
