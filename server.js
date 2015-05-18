@@ -81,8 +81,8 @@ var server = http.createServer(app)
 
 var webSocketServer = new ws.Server({ server: server })
 
-rooms['/room/main'] = createRoom()
-// rooms['/room/main2'] = createRoom()
+rooms['/room/main'] = createRoom({ maxPlayers: 8 })
+rooms['/room/main2'] = createRoom({ maxPlayers: 8 })
 // rooms['/room/main3'] = createRoom()
 // rooms['/room/main4'] = createRoom()
 // rooms['/room/main5'] = createRoom()
@@ -120,7 +120,10 @@ function createRoom(opt) {
             camera: null,
             debugInfo: DEBUG === true,
         })
-        worldGen({ mp: mp })
+        worldGen({
+            mp: mp,
+            seed: Math.floor(Math.random() * 99999)
+        })
         mp.askForNewRound = newRound
         roomEvents.emit('end-round')
         scoreboard = makeScoreboard({ mp: mp })
