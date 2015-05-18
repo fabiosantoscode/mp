@@ -31,6 +31,7 @@ var makeMain = require('./lib/main.js')
 
 var TPS = 24  // ticks per second
 var DEBUG = process.argv.indexOf('--debug') !== -1
+var BUILD = process.argv.indexOf('--build') !== -1
 
 var rooms = {}
 
@@ -38,6 +39,16 @@ var toBrowserify = require('./server/browserify-bundles.json')
 
 var app = connect();
 
+if (BUILD) {
+    for (var bundleName in toBrowserify) {
+        serveBrowserify.compile({
+            bundleName: path.join(__dirname, 'public', bundleName),
+            debug: false,
+            entryPoint: toBrowserify[bundleName]
+        })
+    }
+    return;
+}
 
 
 app.use(require('compression')())
