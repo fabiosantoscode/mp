@@ -65,7 +65,7 @@ module.exports = function serveBrowserify(entryPoint, opt) {
         res.setHeader('cache-control', 'max-age=36000, public, must-revalidate')
         res.setHeader('last-modified', thisRunDate)
 
-        var useTraceur = /[?&;]noharmony(&|;|$)/.test(req.url)
+        var useTraceur = opt.traceur || /[?&;]noharmony(&|;|$)/.test(req.url)
 
         if (cached) {
             res.end(useTraceur ? getTraceur(cached) : cached)
@@ -86,7 +86,13 @@ module.exports.compile = function compile(opt) {
     getBrowserified({
         entryPoint: opt.entryPoint,
         debug: false
-    }, function(body) {
-        fs.writeFile(opt.bundleName, body, { encoding: 'utf-8' }, console.log.bind(console))
+    }, function (body) {
+        if (!opt.traceur) return done(body)
+
+        done(getTraceur(body))
     })
+
+    function done(body) {
+        fs.writeFile(opt.bundleName, body, { encoding: 'utf-8' }, console.log.bind(console))
+    }
 }

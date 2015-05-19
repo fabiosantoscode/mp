@@ -1,7 +1,7 @@
 function loadMaybeHarmony(src) {
     var doc = document;
     if (!loadMaybeHarmony.harmonySupport) {
-        src += '?noharmony'
+        src = src.replace(/js$/, 'traceur.js')
     }
     var script = document.createElement('script')
     script.src = src
