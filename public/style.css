@@ -173,11 +173,6 @@ body.rooms a, body.rooms a:visited {
     white-space: pre;
 }
 
-.homepage-spectate .playbtn.going {
-    transform: scale(3);
-    opacity: 0;
-}
-
 .homepage-spectate:hover .playbtn,
 .homepage-spectate .playbtn.going {
     opacity: 0.8;
