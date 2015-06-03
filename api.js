@@ -9,11 +9,15 @@ module.exports = function makeApi(rooms) {
     var fewShowing
     var fewAge
     function fewRooms() {
-        if (fewAge !== undefined && +new Date - fewAge < 1000) { return fewShowing }
+        if (fewAge !== undefined && +new Date - fewAge < 5000) { return fewShowing }
         fewShowing = Object.keys(rooms)
             .sort(() => Math.random() - 0.5)  // shuffle
+            .map(key => ({
+                playerCount: rooms[key].players.length,
+                name: key,
+            }))
         fewAge = +new Date()
-        return fewRooms()
+        return fewShowing
     }
 
     app.use('/rooms/few', JSONRES((req, res) =>
