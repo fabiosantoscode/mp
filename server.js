@@ -218,9 +218,13 @@ function createRoom(opt) {
 
             players++;
 
-            botFill()
+            if (!kwParams.isBot) botFill()
 
             function newMain() {
+                player = null
+
+                if (kwParams.isBot) return;
+
                 mainStreamCompressor = makeCompressor(function () { return player }, mp)
                 mainRs = main.createReadStream()
                 mainRs
@@ -240,8 +244,6 @@ function createRoom(opt) {
                         return new Buffer(data + '\n', 'utf-8')
                     }))
                     .pipe(socket)
-
-                player = null
             }
 
             function respawn(newPlayer) {
