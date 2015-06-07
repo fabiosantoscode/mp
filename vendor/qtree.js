@@ -136,10 +136,10 @@ function QuadTree(x, y, w, h, options) {
     function overlap_rect(o1, o2, buf) {
         if( !o1 || !o2 )
             return true;
-        if( o1.x + o1.w < o2.x - buf ||
-            o1.y + o1.h < o2.y - buf ||
-            o1.x - buf > o2.x + o2.w ||
-            o1.y - buf > o2.y + o2.h )
+        if( o1.x + o1.w < o2.x ||
+            o1.x > o2.x + o2.w ||
+            o1.y + o1.h < o2.y ||
+            o1.y > o2.y + o2.h )
             return false;
         return true;
     }
