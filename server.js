@@ -21,6 +21,7 @@ traceurRequire.makeDefault(function (filename) {
     return !/node_modules/.test(filename) && filename.indexOf(__dirname) !== -1
 })
 
+var makeBotSocket = require('./lib/bot')
 var makeClockSync = require('./lib/clock-sync')
 var worldGen = require('./lib/worldgen.js')
 var makeCompressor = require('./lib/netcompressor.js')
@@ -113,8 +114,8 @@ var server = http.createServer(app)
 
 var webSocketServer = new ws.Server({ server: server })
 
-rooms['/room/main'] = createRoom({ maxPlayers: 8 })
-rooms['/room/main2'] = createRoom({ maxPlayers: 8 })
+rooms['/room/main'] = createRoom({ maxPlayers: 8, botFill: 4 })
+rooms['/room/main2'] = createRoom({ maxPlayers: 8, botFill: 4 })
 // rooms['/room/main3'] = createRoom()
 // rooms['/room/main4'] = createRoom()
 // rooms['/room/main5'] = createRoom()
@@ -126,6 +127,35 @@ function createRoom(opt) {
     var networld
     var main
     var scoreboard
+    var roomEvents = new events.EventEmitter()
+    roomEvents.setMaxListeners(255)
+
+    var bots = []
+
+    function botFill() {
+        if (!opt.botFill) { return; }
+
+        while (players + bots.length < opt.botFill) {
+            (function () {
+                var sock = makeBotSocket({ mp: mp })
+                room.addPlayer(sock, { isBot: true })
+                bots.push(sock)
+            }())
+        }
+
+        while (bots.length !== 0 &&
+                players + bots.length > opt.botFill) {
+            bots.pop().destroy()
+        }
+    }
+
+    roomEvents.on('end-round', function () {
+        for (var i = 0; i < bots.length; i++) {
+            bots[i].destroy()
+        }
+        bots = []
+        botFill()
+    })
 
     var gameStartTime = +new Date()
 
@@ -161,8 +191,6 @@ function createRoom(opt) {
         scoreboard = makeScoreboard({ mp: mp })
     }
 
-    var roomEvents = new events.EventEmitter()
-    roomEvents.setMaxListeners(255)
 
     newRound()
 
@@ -172,11 +200,13 @@ function createRoom(opt) {
     var room
     return room = Object.freeze({
         players: [],
-        addPlayer: function (socket) {
+        addPlayer: function (socket, kwParams) {
             if (players + 1 > opt.maxPlayers)
                 return socket.end('["fatal", "too many players"]\n')
 
             var playerId = ++playerIds
+
+            kwParams = kwParams || {}
 
             var player
             var playerWs
@@ -187,6 +217,8 @@ function createRoom(opt) {
             var mainRs
 
             players++;
+
+            botFill()
 
             function newMain() {
                 mainStreamCompressor = makeCompressor(function () { return player }, mp)
@@ -239,7 +271,7 @@ function createRoom(opt) {
 
                 socket.unpipe()
                 socket.pipe(makeSanitizer())
-                    .pipe(es.parse())
+                    .pipe(es.parse({ errors: true }))
                     .on('data', function (data) {
                         if (data[0] === 'my-name' && data[1])
                             setName(data[1])
@@ -261,6 +293,8 @@ function createRoom(opt) {
 
                 if (mainStreamCompressor)
                     mainStreamCompressor.destroy()
+
+                botFill()
             }
 
             newMain()
