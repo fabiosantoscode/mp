@@ -159,7 +159,7 @@ function createRoom(opt) {
 
     var gameStartTime = +new Date()
 
-    opt.maxPlayers = opt.maxPlayers || 255
+    opt.maxPlayers = opt.maxPlayers || 24
     assert(opt.maxPlayers > 0)
     assert(opt.maxPlayers <= 255)
 
