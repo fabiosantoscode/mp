@@ -231,11 +231,6 @@ function createRoom(opt) {
                 mainRs = main.createReadStream()
                 mainRs
                     .pipe(mainStreamCompressor)
-                    .pipe(es.mapSync(function (data)  {
-                        return data[0] === 'set3d' ?
-                            [+new Date()].concat(data) :
-                            data
-                    }))
                     .pipe(es.mapSync(function (data) {
                         data = JSON.stringify(data, function replacer(_, value) {
                             return value == 'number' ?
