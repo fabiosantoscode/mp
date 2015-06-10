@@ -52,6 +52,8 @@ if (BUILD) {
             debug: false,
             entryPoint: toBrowserify[bundleName]
         })
+    }
+    for (var bundleName in toBrowserify) {
         serveBrowserify.compile({
             bundleName: traceurName(path.join(__dirname, 'public', bundleName)),
             debug: false,
