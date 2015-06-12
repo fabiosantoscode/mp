@@ -137,16 +137,14 @@ function createRoom(opt) {
     function botFill() {
         if (!opt.botFill) { return; }
 
-        while (players + bots.length < opt.botFill) {
-            (function () {
-                var sock = makeBotSocket({ mp: mp })
-                room.addPlayer(sock, { isBot: true })
-                bots.push(sock)
-            }())
+        while (players < opt.botFill) {
+            var sock = makeBotSocket({ mp: mp })
+            room.addPlayer(sock, { isBot: true })
+            bots.push(sock)
         }
 
         while (bots.length !== 0 &&
-                players + bots.length > opt.botFill) {
+                players > opt.botFill) {
             bots.pop().destroy()
         }
     }
