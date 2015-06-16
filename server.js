@@ -30,7 +30,6 @@ var makeScoreboard = require('./lib/scoreboard.js')
 var makeMp = require('./lib/mp.js')
 var makeMain = require('./lib/main.js')
 
-var TPS = 24  // ticks per second
 var DEBUG = process.argv.indexOf('--debug') !== -1
 var BUILD = process.argv.indexOf('--build') !== -1
 var NOBROWSERIFY = process.argv.indexOf('--no-browserify') !== -1
