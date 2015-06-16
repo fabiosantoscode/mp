@@ -251,15 +251,18 @@ body.rooms a, body.rooms a:visited {
 .scoreboard table {
     table-layout: fixed;
     margin: 5vmin;
-    background-color: #fea;
+    width: 90%;
+    width: calc(100% - 10vmin);
+    text-align: center;
 }
 
-.scoreboard td {
-    width: 40vw;
+.scoreboard tr.player-in-team-red {
+    background-color: rgba(255, 60, 60, 0.8);
+    color: white;
 }
-
-.scoreboard td + td {
-    width: 40vw;
+.scoreboard tr.player-in-team-blue {
+    background-color: rgba(60, 60, 255, 0.8);
+    color: white;
 }
 
 .rooms-list {
