@@ -29,6 +29,7 @@
     "es6-promise": "^2.0.1",
     "event-stream": "^3.2.1",
     "fsm-event": "^1.0.3",
+    "fullscreen": "^1.0.0",
     "random-js": "^1.0.4",
     "simple-quadtree": "^0.1.2",
     "through2": "^0.6.1",
