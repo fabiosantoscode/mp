@@ -115,27 +115,8 @@ function QuadTree(x, y, w, h, options) {
         }
     }
     
-    // does a line and a rectangle overlap ?
-    function overlap_line(o1, o2, buf) {
-        if( !o1 || !o2 )
-            return true;
-        var dist = distancePL(o2.x + 0.5 * o2.w,
-                              o2.y + 0.5 * o2.h,
-                              o1.x, o1.y, o1.dx, o1.dy, o1.dist);
-        if( dist ) {
-            dist.dist -= buf;
-            if( dist.dist < 0 )
-                return true;
-            if( dist.dist * dist.dist <= o2.w * o2.w + o2.h * o2.h )
-                return true;
-        }
-        return false;
-    }
-
     // do two rectangles overlap ?
     function overlap_rect(o1, o2, buf) {
-        if( !o1 || !o2 )
-            return true;
         if( o1.x + o1.w < o2.x ||
             o1.x > o2.x + o2.w ||
             o1.y + o1.h < o2.y ||
@@ -239,65 +220,29 @@ function QuadTree(x, y, w, h, options) {
             put_to_nodes(node, obj);
     }
 
-    // iterate through all objects in this node matching given overlap
-    // function
-    function getter(overlapfun, node, obj, buf, strict, callback) {
+    // iterate through all objects in this node matching the given rectangle
+    function get_rect(node, obj, callback) {
         for( var li = 0; li < node.l.length; li++ )
-            if( !strict || overlapfun(obj, node.l[li], buf) )
+            if( overlap_rect(obj, node.l[li]) )
                 if( !callback(node.l[li], { inside: 'l', index: li, node: node }) )
                     return false;
         for( var li = 0; li < node.c.length; li++ )
-            if( !strict || overlapfun(obj, node.c[li], buf) )
+            if( overlap_rect(obj, node.c[li]) )
                 if( !callback(node.c[li], { inside: 'c', index: li, node: node }) )
                     return false;
         for( var ni = 0; ni < node.n.length; ni++ ) {
-            if( overlapfun(obj, node.n[ni], buf) ) {
-                if( !getter(overlapfun, node.n[ni], obj, buf, strict, callback) )
+            if( overlap_rect(obj, node.n[ni]) ) {
+                if( !get_rect(node.n[ni], obj, callback) )
                     return false;
             }
         }
         return true;
     }
 
-    // iterate through all objects in this node matching the given rectangle
-    function get_rect(node, obj, buf, callback) {
-        return getter(overlap_rect, node, obj, buf, true, callback);
-    }
-
-    // iterate through all objects in this node matching the given
-    // line (segment)
-    function get_line(node, obj, buf, callback) {
-        return getter(overlap_line, node, obj, buf, false, callback);
-    }
-
-    // iterate through all objects in this node matching given
-    // geometry, either a rectangle or a line segment
-    function get(node, obj, buf, callback) {
-
-        if( typeof buf == 'function' && typeof callback == 'undefined' ) {
-            callback = buf;
-            buf = 0;
-        }
-        if( obj == null )
-            get_rect(node, obj, buf, callback);
-        else if( typeof obj.x == 'number' &&
-                 typeof obj.y == 'number' &&
-                 !isNaN(obj.x) && !isNaN(obj.y) ) {
-            if( typeof obj.dx == 'number' &&
-                typeof obj.dy == 'number' &&
-                !isNaN(obj.dx) && !isNaN(obj.dy) )
-                get_line(node, obj, buf, callback);
-            else if( typeof obj.w == 'number' &&
-                     typeof obj.h == 'number' &&
-                     !isNaN(obj.w) && !isNaN(obj.h) )
-                get_rect(node, obj, buf, callback);
-        }
-    }
-
     // return the object interface
     return {
-        get: function(obj, buf, callback) {
-            get(root, obj, buf, callback);
+        get: function(obj, callback) {
+            get_rect(root, obj, callback);
         },
         getRoot: function () {
             return root;
@@ -307,33 +252,6 @@ function QuadTree(x, y, w, h, options) {
         },
         remove: function(obj, attr) {
             return remove(root, obj, attr);
-        },
-        stringify: function() {
-            var strobj = {
-                x: x, y: y, w: w, h: h,
-                maxc: maxc, 
-                leafratio: leafratio,
-                root: root
-            };
-            try {
-                return JSON.stringify(strobj);
-            } catch(err) {
-                // could not stringify
-                // probably due to objects included in qtree being non-stringifiable
-                return null; 
-            }
-        },
-        parse: function(str) {
-            if( typeof str == 'string' )
-                str = JSON.parse(str);
-            
-            x = str.x;
-            y = str.y;
-            w = str.w;
-            h = str.h;
-            maxc = str.maxc;
-            leafratio = str.leafratio;
-            root = str.root;
         }
     };
 }
