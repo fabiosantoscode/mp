@@ -8,6 +8,7 @@ body.game {
 
 html, body {
     height: 100%;
+    width: 100%;  /* Fullscreen, in chrome */
     margin: 0;
     padding: 0;
 
