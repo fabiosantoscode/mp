@@ -144,7 +144,9 @@ function createRoom(opt) {
 
         while (bots.length !== 0 &&
                 players > opt.botFill) {
-            bots.pop().destroy()
+            var bot = bots.pop()
+            bot.disconnectPlayer()
+            bot.destroy()
         }
     }
 
@@ -152,7 +154,7 @@ function createRoom(opt) {
         for (var i = 0; i < bots.length; i++) {
             bots[i].destroy()
         }
-        bots = []
+        bots.length = 0
         botFill()
     })
 
@@ -315,12 +317,20 @@ function createRoom(opt) {
                 roomEvents.once('end-round', thisFunc)
             })
 
-            socket.on('close', function disconnectPlayer() {
+            var disconnected = false
+            function disconnectPlayer() {
+                if (disconnected) { return; }
+                disconnected = true
                 players--
                 destroy()
                 scoreboard.remove(playerId)
                 if (player) { mp.entities.remove(player) }
-            })
+            }
+
+            socket.disconnectPlayer = disconnectPlayer
+
+            socket.on('close', disconnectPlayer)
+            socket.on('end', disconnectPlayer)
         },
         addSpectator: function (socket) {
             main.createReadStream()
