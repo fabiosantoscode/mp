@@ -36,7 +36,7 @@
     "traceur": "0.0.79",
     "uglify-js": "git://github.com/fabiosantoscode/UglifyJS2#harmony",
     "websocket-stream": "^1.4.0",
-    "ws": "^0.4.32"
+    "ws": "^0.8.0"
   },
   "devDependencies": {
     "sinon": "~1.8.2"
