@@ -14,12 +14,6 @@ var serveBrowserify = require('./serve-browserify.js')
 var websocketStream = require('websocket-stream');
 var ecstatic = require('ecstatic');
 var connect = require('connect');
-var traceurRequire = require('traceur/src/node/require.js');
-
-traceurRequire.makeDefault(function (filename) {
-    // Files in ./lib are es6
-    return !/node_modules/.test(filename) && filename.indexOf(__dirname) !== -1
-})
 
 var makeBotSocket = require('./lib/bot')
 var makeClockSync = require('./lib/clock-sync')
@@ -60,7 +54,7 @@ if (BUILD) {
             traceur: true
         })
     }
-    return;
+    process.exit(0);
 }
 
 if (!NOBROWSERIFY) {
