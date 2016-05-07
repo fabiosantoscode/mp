@@ -50,7 +50,7 @@ if (!NOBROWSERIFY) {
         app.use(
             bundleName,
             serveBrowserify(toBrowserify[bundleName], {
-                precache: false, debug: DEBUG
+                precache: DEBUG, debug: DEBUG
             }))
     }
 }
