@@ -5,17 +5,9 @@ var browserify = require('browserify');
 var UglifyJS = require('uglify-js');
 var fs = require('fs')
 var path = require('path')
-var traceur = require('traceur/src/node/api.js');
 
 var thisRunID = +new Date()
 var thisRunDate = new Date().toUTCString();
-
-function getTraceur(body) {
-    return Buffer.concat([
-        fs.readFileSync(path.join(__dirname, 'node_modules/traceur/bin/traceur-runtime.js')),
-        new Buffer(traceur.compile(body.toString('utf-8')), 'utf-8')
-    ])
-}
 
 function getBrowserified(opt, cb) {
     var b = browserify({
@@ -65,15 +57,13 @@ module.exports = function serveBrowserify(entryPoint, opt) {
         res.setHeader('cache-control', 'max-age=36000, public, must-revalidate')
         res.setHeader('last-modified', thisRunDate)
 
-        var useTraceur = opt.traceur || /[?&;]noharmony(&|;|$)/.test(req.url)
-
         if (cached) {
-            res.end(useTraceur ? getTraceur(cached) : cached)
+            res.end(cached)
         } else {
             getBrowserified(getBrowserifiedOpt, function (body) {
                 if (opt.debug)  // Don't waste this ram in production
                     cached = body
-                res.end(useTraceur ? getTraceur(body) : body)
+                res.end(body)
             })
         }
     }
@@ -87,9 +77,7 @@ module.exports.compile = function compile(opt) {
         entryPoint: opt.entryPoint,
         debug: false
     }, function (body) {
-        if (!opt.traceur) return done(body)
-
-        done(getTraceur(body))
+        return done(body)
     })
 
     function done(body) {

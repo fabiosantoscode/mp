@@ -12,13 +12,12 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "babel-node server.js"
+    "start": "node server.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "async": "^0.9.0",
-    "babel": "^5.8.5",
     "browserify": "^8.0.2",
     "cappedarray": "^0.1.2",
     "connect": "^3.3.3",
@@ -29,7 +28,6 @@
     "event-stream": "^3.2.1",
     "fullscreen": "^1.0.0",
     "random-js": "^1.0.4",
-    "traceur": "0.0.79",
     "uglify-js": "git://github.com/mishoo/UglifyJS2#harmony",
     "websocket-stream": "^1.4.0",
     "ws": "^0.8.0"

@@ -34,24 +34,12 @@ var toBrowserify = require('./server/browserify-bundles.json')
 
 var app = connect();
 
-function traceurName(filename) {
-    return filename.replace(/js$/, 'traceur.js')
-}
-
 if (BUILD) {
     for (var bundleName in toBrowserify) {
         serveBrowserify.compile({
             bundleName: path.join(__dirname, 'public', bundleName),
             debug: false,
             entryPoint: toBrowserify[bundleName]
-        })
-    }
-    for (var bundleName in toBrowserify) {
-        serveBrowserify.compile({
-            bundleName: traceurName(path.join(__dirname, 'public', bundleName)),
-            debug: false,
-            entryPoint: toBrowserify[bundleName],
-            traceur: true
         })
     }
     process.exit(0);
@@ -63,11 +51,6 @@ if (!NOBROWSERIFY) {
             bundleName,
             serveBrowserify(toBrowserify[bundleName], {
                 precache: false, debug: DEBUG
-            }))
-        app.use(
-            traceurName(bundleName),
-            serveBrowserify(toBrowserify[bundleName], {
-                precache: false, debug: DEBUG, traceur: true
             }))
     }
 }

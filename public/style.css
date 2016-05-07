@@ -81,12 +81,6 @@ body {
     image-rendering: pixelated;
 }
 
-.no-crisp-edges .game-canvas {
-    /* When there's no crisp edges support, only scale up to 4x */
-    max-width: 400px;
-    max-height: 400px;
-}
-
 .keyboard .left-buttons,
 .keyboard .right-buttons {
     position: absolute;
