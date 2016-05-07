@@ -20,6 +20,7 @@
     "async": "^0.9.0",
     "babel": "^5.8.5",
     "browserify": "^8.0.2",
+    "cappedarray": "^0.1.2",
     "connect": "^3.3.3",
     "defined": "^1.0.0",
     "dom-event-stream": "0.0.1",
