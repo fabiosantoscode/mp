@@ -17,6 +17,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "abstract-pool": "^2.0.0",
     "async": "^0.9.0",
     "browserify": "^8.0.2",
     "cappedarray": "^0.1.2",
