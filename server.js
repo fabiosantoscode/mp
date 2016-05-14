@@ -276,8 +276,6 @@ function createRoom(opt) {
             newMain()
             respawn()
 
-            require('./lib/push-player-position.js')(function () { return player }, socket)
-
             scoreboard.add(playerId)
 
             function setName(name) {
