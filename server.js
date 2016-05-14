@@ -135,7 +135,7 @@ function createRoom(opt) {
         botFill()
     })
 
-    var gameStartTime = +new Date()
+    var gameStartTime = Date.now()
 
     opt.maxPlayers = opt.maxPlayers || 24
     assert(opt.maxPlayers > 0)
@@ -226,7 +226,7 @@ function createRoom(opt) {
 
                 if (!newPlayer) {
                     var PlayerClass = mp.getPlayerClass()
-                    player = new PlayerClass()
+                    player = mp.entities.construct(PlayerClass)
                 } else {
                     player = newPlayer
                     var PlayerClass = player.constructor
