@@ -203,17 +203,18 @@ function createRoom(opt) {
 
                 if (kwParams.isBot) return;
 
+                function replacer(_, value) {
+                    return value == 'number' ?
+                        Number((value+'')
+                            .replace(/(-?\d+\.\d\d)\d+/g, '$1')) :
+                        value
+                }
                 mainStreamCompressor = makeCompressor(function () { return player }, mp)
                 mainRs = main.createReadStream()
                 mainRs
                     .pipe(mainStreamCompressor)
                     .pipe(es.mapSync(function (data) {
-                        data = JSON.stringify(data, function replacer(_, value) {
-                            return value == 'number' ?
-                                Number((value+'')
-                                    .replace(/(-?\d+\.\d\d)\d+/g, '$1')) :
-                                value
-                            })
+                        data = JSON.stringify(data, replacer)
                         return new Buffer(data + '\n', 'utf-8')
                     }))
                     .pipe(socket)

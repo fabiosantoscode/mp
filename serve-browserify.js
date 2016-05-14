@@ -22,11 +22,12 @@ function getBrowserified(opt, cb) {
             return console.error('/* Error in serveBrowserify! */', err);
         }
         if (!opt.debug) {
-            body = UglifyJS.minify(body.toString('utf-8'), {
+            body = body.toString('utf-8')
+            /*body = UglifyJS.minify(body.toString('utf-8'), {
                 fromString: true,
                 unsafe: true,
                 warnings: false
-            }).code
+            }).code*/
         }
         cb && cb(body)
     }))

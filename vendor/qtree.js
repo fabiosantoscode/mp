@@ -214,27 +214,35 @@ function QuadTree(x, y, w, h, options) {
                             createnode(node.x + w2, node.y + h2, w2, h2));
                 for( var ci = 0; ci < node.c.length; ci++ ) 
                     put_to_nodes(node, node.c[ci]);
-                node.c = [];
+                node.c.length = 0;
             }
         } else 
             put_to_nodes(node, obj);
     }
 
     // iterate through all objects in this node matching the given rectangle
-    function get_rect(node, obj, callback) {
-        for( var li = 0; li < node.l.length; li++ )
-            if( overlap_rect(obj, node.l[li]) )
-                if( !callback(node.l[li], 'l', li, node) )
+    function get_rect(node, x, y, w, h, callback) {
+        var rect
+        var i = node.l.length
+        while ( i-- ) {
+            rect = node.l[i]
+            if (x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                if( !callback(rect, 'l', i, node) )
                     return false;
-        for( var li = 0; li < node.c.length; li++ )
-            if( overlap_rect(obj, node.c[li]) )
-                if( !callback(node.c[li], 'c', li, node) )
+        }
+        i = node.c.length;
+        while ( i-- ) {
+            rect = node.c[i]
+            if (x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                if( !callback(rect, 'c', i, node) )
                     return false;
-        for( var ni = 0; ni < node.n.length; ni++ ) {
-            if( overlap_rect(obj, node.n[ni]) ) {
-                if( !get_rect(node.n[ni], obj, callback) )
+        }
+        i = node.n.length
+        while ( i-- ) {
+            rect = node.n[i]
+            if (x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                if( !get_rect(rect, x, y, w, h, callback) )
                     return false;
-            }
         }
         return true;
     }
@@ -242,7 +250,11 @@ function QuadTree(x, y, w, h, options) {
     // return the object interface
     return {
         get: function(obj, callback) {
-            get_rect(root, obj, callback);
+            get_rect(root, obj.x, obj.y, obj.w, obj.h, callback);
+        },
+        getl: function (x, y, w, h, callback) {
+            /* long-winded version of `get`. Avoids allocating the option object */
+            get_rect(root, x, y, w, h, callback);
         },
         getRoot: function () {
             return root;
