@@ -125,6 +125,7 @@ function QuadTree(x, y, w, h, options) {
         return true;
     }
 
+    var _isleafresult = { leaf: false, childnode: null }
     function isleaf(node, obj) {
 
         var leaf = false;
@@ -147,8 +148,9 @@ function QuadTree(x, y, w, h, options) {
                     childnode = node.n[ni];
             }
         
-        return { leaf: leaf,
-                 childnode: childnode };
+        _isleafresult.leaf = leaf
+        _isleafresult.childnode = childnode
+        return _isleafresult
     }
 
     // put an object to one of the child nodes of this node
