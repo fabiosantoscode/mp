@@ -1,5 +1,7 @@
 'use strict'
 
+var abstractPool = require('abstract-pool')
+
 function QuadTree(x, y, w, h, options) {
 
     if( typeof x != 'number' || isNaN(x) )
@@ -249,7 +251,59 @@ function QuadTree(x, y, w, h, options) {
         return true;
     }
 
+    var _ll_pool = [];
+    function make_ll_node(entity, next) {
+        var ret = _ll_pool.pop() ||
+            (//do
+                console.log('warning: somehow used up all 100 preallocated objects'),
+                Object.seal({ entity: null, next: null }))
+        ret.entity = entity
+        ret.next = next
+        return ret
+    }
+    ;(function prealloc (i) {
+        if (!i) { return }
+        _ll_pool.push(Object.seal({ entity: null, next: null }))
+        prealloc(--i)
+    })(100)
+    function reclaim_ll(ll) {
+        while (ll && ll !== NIL) {
+            _ll_pool.push(ll)
+            ll = ll.next
+        }
+    }
+    // iterate through all objects in this node matching the given rectangle
+    function get_solid_ll(node, x, y, w, h, entity, results) {
+        var rect
+        var i = node.l.length
+        while ( i-- ) {
+            rect = node.l[i]
+            if (rect.entity !== entity && x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                if( rect.entity.solid ) {
+                    results = make_ll_node(rect.entity, results)
+                }
+        }
+        i = node.c.length;
+        while ( i-- ) {
+            rect = node.c[i]
+            if (rect.entity !== entity && x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                if( rect.entity.solid ) {
+                    results = make_ll_node(rect.entity, results)
+                }
+        }
+        i = node.n.length
+        while ( i-- ) {
+            rect = node.n[i]
+            if (x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                results = get_solid_ll(rect, x, y, w, h, entity, results)
+        }
+        return results
+    }
+
     // return the object interface
+    var NIL = Object.freeze({ entity: null, next: null })
+    var last_get_solid_ll = null
+
     return {
         get: function(obj, callback) {
             get_rect(root, obj.x, obj.y, obj.w, obj.h, callback);
@@ -257,6 +311,11 @@ function QuadTree(x, y, w, h, options) {
         getl: function (x, y, w, h, callback) {
             /* long-winded version of `get`. Avoids allocating the option object */
             get_rect(root, x, y, w, h, callback);
+        },
+        get_solid_ll: function (x, y, w, h, entity) {
+            reclaim_ll(last_get_solid_ll)
+            last_get_solid_ll = get_solid_ll(root, x, y, w, h, entity, NIL)
+            return last_get_solid_ll
         },
         getRoot: function () {
             return root;
