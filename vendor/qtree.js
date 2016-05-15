@@ -252,27 +252,60 @@ function QuadTree(x, y, w, h, options) {
     }
 
     var _ll_pool = [];
+    var _ll_proto = { reclaim: reclaim_ll }
+    var _construct_ll_node = () => {
+        var ret = Object.create(_ll_proto)
+        ret.entity = ret.next = null
+        Object.seal(ret)
+        return ret
+    }
     function make_ll_node(entity, next) {
         var ret = _ll_pool.pop() ||
             (//do
                 console.log('warning: somehow used up all 100 preallocated objects'),
-                Object.seal({ entity: null, next: null }))
+                _construct_ll_node(null, null))
         ret.entity = entity
         ret.next = next
         return ret
     }
     ;(function prealloc (i) {
         if (!i) { return }
-        _ll_pool.push(Object.seal({ entity: null, next: null }))
+        _ll_pool.push(_construct_ll_node(null, null))
         prealloc(--i)
     })(100)
     function reclaim_ll(ll) {
+        ll = ll || this
         while (ll && ll !== NIL) {
             _ll_pool.push(ll)
             ll = ll.next
         }
     }
-    // iterate through all objects in this node matching the given rectangle
+    function get_non_static_ll(node, x, y, w, h, entity, results) {
+        var rect
+        var i = node.l.length
+        while ( i-- ) {
+            rect = node.l[i]
+            if (rect.entity !== entity && x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                if( !rect.entity.static ) {
+                    results = make_ll_node(rect.entity, results)
+                }
+        }
+        i = node.c.length;
+        while ( i-- ) {
+            rect = node.c[i]
+            if (rect.entity !== entity && x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                if( !rect.entity.static ) {
+                    results = make_ll_node(rect.entity, results)
+                }
+        }
+        i = node.n.length
+        while ( i-- ) {
+            rect = node.n[i]
+            if (x + w >= rect.x && x <= rect.x + rect.w && y + h >= rect.y && y <= rect.y + rect.h)
+                results = get_non_static_ll(rect, x, y, w, h, entity, results)
+        }
+        return results
+    }
     function get_solid_ll(node, x, y, w, h, entity, results) {
         var rect
         var i = node.l.length
@@ -300,10 +333,9 @@ function QuadTree(x, y, w, h, options) {
         return results
     }
 
-    // return the object interface
-    var NIL = Object.freeze({ entity: null, next: null })
-    var last_get_solid_ll = null
+    var last_ll_returned = null
 
+    // return the object interface
     return {
         get: function(obj, callback) {
             get_rect(root, obj.x, obj.y, obj.w, obj.h, callback);
@@ -312,10 +344,21 @@ function QuadTree(x, y, w, h, options) {
             /* long-winded version of `get`. Avoids allocating the option object */
             get_rect(root, x, y, w, h, callback);
         },
-        get_solid_ll: function (x, y, w, h, entity) {
-            reclaim_ll(last_get_solid_ll)
-            last_get_solid_ll = get_solid_ll(root, x, y, w, h, entity, NIL)
-            return last_get_solid_ll
+        get_non_static_ll: function (x, y, w, h, entity, reclaimable) {
+            if (reclaimable) {
+                return get_non_static_ll(root, x, y, w, h, entity, NIL)
+            }
+            reclaim_ll.call(last_ll_returned)
+            last_ll_returned = get_non_static_ll(root, x, y, w, h, entity, NIL)
+            return last_ll_returned
+        },
+        get_solid_ll: function (x, y, w, h, entity, reclaimable) {
+            if (reclaimable) {
+                return get_solid_ll(root, x, y, w, h, entity, NIL)
+            }
+            reclaim_ll.call(last_ll_returned)
+            last_ll_returned = get_solid_ll(root, x, y, w, h, entity, NIL)
+            return last_ll_returned
         },
         getRoot: function () {
             return root;
@@ -329,6 +372,6 @@ function QuadTree(x, y, w, h, options) {
     };
 }
 
-// for use within node.js
-if( typeof module != 'undefined' )
-    module.exports = QuadTree;
+var NIL = Object.freeze({ entity: null, next: null, reclaim: () => null })
+QuadTree.NIL = NIL
+module.exports = QuadTree;
