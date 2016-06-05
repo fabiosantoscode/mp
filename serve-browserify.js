@@ -2,7 +2,6 @@
 
 var es = require('event-stream');
 var browserify = require('browserify');
-var UglifyJS = require('uglify-js');
 var fs = require('fs')
 var path = require('path')
 
@@ -23,11 +22,6 @@ function getBrowserified(opt, cb) {
         }
         if (!opt.debug) {
             body = body.toString('utf-8')
-            /*body = UglifyJS.minify(body.toString('utf-8'), {
-                fromString: true,
-                unsafe: true,
-                warnings: false
-            }).code*/
         }
         cb && cb(body)
     }))
