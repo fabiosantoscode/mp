@@ -82,7 +82,7 @@ app.use('/', ecstatic({
     root: path.join(__dirname, 'public'),
 }));
 
-var port = +(process.argv[2] || '8080')
+var port = +process.argv[2] || '8080'
 var server = http.createServer(app)
     .listen(port)
     .on('listening', function () {

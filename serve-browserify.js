@@ -1,7 +1,6 @@
 "use strict"
 
 var es = require('event-stream');
-var browserify = require('browserify');
 var fs = require('fs')
 var path = require('path')
 
@@ -9,6 +8,8 @@ var thisRunID = +new Date()
 var thisRunDate = new Date().toUTCString();
 
 function getBrowserified(opt, cb) {
+    // Required in this scope because it's a tad large
+    var browserify = require('browserify');
     var b = browserify({
         entries: [opt.entryPoint],
         debug: !!opt.debug,
